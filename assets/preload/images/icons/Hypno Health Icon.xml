@@ -1,0 +1,7 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TextureAtlas imagePath="Hypno Health Icon.png">
+	<!-- Created with Adobe Animate version 21.0.9.42677 -->
+	<!-- http://www.adobe.com/products/animate.html -->
+	<SubTexture name="Hypno Icon0000" x="0" y="0" width="146" height="135" frameX="-13" frameY="-4" frameWidth="182" frameHeight="146"/>
+	<SubTexture name="Hypno Icon0001" x="156" y="0" width="182" height="146"/>
+</TextureAtlas>
