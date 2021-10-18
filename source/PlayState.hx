@@ -357,13 +357,20 @@ class PlayState extends MusicBeatState
 					add(stageCurtains);
 				}
 			case 'alley':
-				var consistentPosition:Array<Float> = [-700, -800];
+				var consistentPosition:Array<Float> = [-300, -600];
+				var resizeBG:Float = 0.7;
 				
 				var background:BGSprite = new BGSprite('hypno/Hypno bg background', consistentPosition[0], consistentPosition[1]);
+				background.setGraphicSize(Std.int(background.width * resizeBG));
+				background.updateHitbox();
 				add(background);
 				var midGround:BGSprite = new BGSprite('hypno/Hypno bg midground', consistentPosition[0], consistentPosition[1]);
+				midGround.setGraphicSize(Std.int(midGround.width * resizeBG));
+				midGround.updateHitbox();
 				add(midGround);
 				foreground = new BGSprite('hypno/Hypno bg foreground', consistentPosition[0], consistentPosition[1]);
+				foreground.setGraphicSize(Std.int(foreground.width * resizeBG));
+				foreground.updateHitbox();
 		}
 
 		add(gfGroup);
@@ -1426,10 +1433,9 @@ class PlayState extends MusicBeatState
 
 		super.update(elapsed);
 
-		if(ratingString == '?') {
-			scoreTxt.text = 'Score: ' + songScore + ' | Misses: ' + songMisses + ' | Rating: ' + ratingString;
-		} else {
-			scoreTxt.text = 'Score: ' + songScore + ' | Misses: ' + songMisses + ' | Rating: ' + ratingString + ' (' + Math.floor(ratingPercent * 100) + '%)';
+		scoreTxt.text = 'Score: ' + songScore + ' | Combo Breaks: ' + songMisses + ' | Rating: ' + ratingString;
+		if(ratingString != '?') {
+			scoreTxt.text += ' (' + Math.floor(ratingPercent * 100) + '%)';
 		}
 
 		if(cpuControlled) {
@@ -2543,15 +2549,6 @@ class PlayState extends MusicBeatState
 						var notesStopped:Bool = false;
 
 						var sortedNotesList:Array<Note> = [];
-						notes.forEachAlive(function(daNote:Note)
-						{
-							if (daNote.canBeHit && daNote.mustPress && !daNote.tooLate 
-							&& !daNote.wasGoodHit && daNote.noteData == i) {
-								sortedNotesList.push(daNote);
-								notesDatas.push(daNote.noteData);
-								canMiss = true;
-							}
-						});
 						sortedNotesList.sort((a, b) -> Std.int(a.strumTime - b.strumTime));
 
 						if (sortedNotesList.length > 0) {
@@ -2582,6 +2579,9 @@ class PlayState extends MusicBeatState
 
 						// Shubs, this is for the "Just the Two of Us" achievement lol
 						//									- Shadow Mario
+
+						// WE'RE COMMUNICATION THROUGH SOURCE CODES
+						//									- Shubs
 						if (!keysPressed[i] && controlArray[i]) 
 							keysPressed[i] = true;
 					}
