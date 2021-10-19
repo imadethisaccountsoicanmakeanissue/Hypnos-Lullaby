@@ -1,0 +1,24 @@
+{
+	"position": [
+		80,
+		20
+	],
+	"dialogue_pos": "left",
+	"scale": 1,
+	"image": "Dialogue GF",
+	"animations": [
+		{
+			"loop_offsets": [
+				0,
+				0
+			],
+			"anim": "real-smooth",
+			"idle_offsets": [
+				-540,
+				101
+			],
+			"loop_name": "",
+			"idle_name": "GF Sprite 4"
+		}
+	]
+}

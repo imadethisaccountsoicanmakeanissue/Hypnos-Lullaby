@@ -73,12 +73,12 @@
 		-200,
 		-400
 	],
-	"healthicon": "bf",
+	"healthicon": "hypno2",
 	"flip_x": false,
 	"healthbar_colors": [
-		49,
-		176,
-		209
+		249,
+		223,
+		68
 	],
 	"camera_position": [
 		-20,

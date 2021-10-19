@@ -1,0 +1,24 @@
+{
+	"position": [
+		80,
+		20
+	],
+	"dialogue_pos": "left",
+	"scale": 0.7,
+	"image": "Dialogue Hypno",
+	"animations": [
+		{
+			"loop_name": "",
+			"idle_offsets": [
+				180,
+				260
+			],
+			"idle_name": "",
+			"anim": "idle",
+			"loop_offsets": [
+				0,
+				0
+			]
+		}
+	]
+}

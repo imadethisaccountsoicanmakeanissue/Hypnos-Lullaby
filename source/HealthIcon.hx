@@ -1,5 +1,8 @@
 package;
 
+import flixel.FlxG;
+import flixel.graphics.FlxGraphic;
+import flixel.graphics.frames.FlxAtlasFrames;
 import flixel.FlxSprite;
 import openfl.utils.Assets as OpenFlAssets;
 
@@ -10,7 +13,10 @@ class HealthIcon extends FlxSprite
 	public var sprTracker:FlxSprite;
 	private var isOldIcon:Bool = false;
 	private var isPlayer:Bool = false;
-	private var char:String = '';
+	public var char:String = '';
+
+	public var initialWidth:Float = 0;
+	public var initialHeight:Float = 0;
 
 	public function new(char:String = 'bf', isPlayer:Bool = false)
 	{
@@ -36,16 +42,31 @@ class HealthIcon extends FlxSprite
 
 	public function changeIcon(char:String) {
 		if(this.char != char) {
-			var name:String = 'icons/' + char;
-			if(!Paths.fileExists('images/' + name + '.png', IMAGE)) name = 'icons/icon-' + char; //Older versions of psych engine's support
-			if(!Paths.fileExists('images/' + name + '.png', IMAGE)) name = 'icons/icon-face'; //Prevents crash from missing icon
-			var file:Dynamic = Paths.image(name);
+			switch (char) {
+				case 'hypno2' | 'hypno-two':
+					// LOOK IM LAZY :sob:
+					var file:FlxAtlasFrames = Paths.getSparrowAtlas('icons/Hypno2 Health Icon');
+					frames = file;
+					
+					animation.addByPrefix(char, 'Hypno2 Icon', 24, true);
+					animation.play(char);
+				default:
+					var name:String = 'icons/' + char;
+					if(!Paths.fileExists('images/' + name + '.png', IMAGE)) name = 'icons/icon-' + char; //Older versions of psych engine's support
+					if(!Paths.fileExists('images/' + name + '.png', IMAGE)) name = 'icons/icon-face'; //Prevents crash from missing icon
 
-			loadGraphic(file, true, 150, 150);
-			animation.add(char, [0, 1], 0, false, isPlayer);
-			animation.play(char);
+					// lmao dont mind me just importing forever's dynamic healthicons
+					var iconGraphic:FlxGraphic = FlxG.bitmap.add(Paths.image(name));
+					loadGraphic(iconGraphic, true, Std.int(iconGraphic.width / 2), iconGraphic.height);
+			
+					animation.add(char, [0, 1], 0, false, isPlayer);
+					animation.play(char);
+			}
 			this.char = char;
-
+			updateHitbox();
+			initialWidth = width;
+			initialHeight = height;
+		
 			antialiasing = ClientPrefs.globalAntialiasing;
 			if(char.endsWith('-pixel')) {
 				antialiasing = false;

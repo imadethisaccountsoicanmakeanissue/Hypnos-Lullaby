@@ -15,7 +15,7 @@
 			"loop": false,
 			"offsets": [
 				-89,
-				197
+				217
 			],
 			"anim": "singUP",
 			"fps": 24,
@@ -58,8 +58,8 @@
 		{
 			"loop": false,
 			"offsets": [
-				107,
-				15
+				124,
+				22
 			],
 			"anim": "singLEFT",
 			"fps": 24,
@@ -73,17 +73,17 @@
 		-90,
 		110
 	],
-	"healthicon": "bf",
+	"healthicon": "hypno",
 	"flip_x": false,
 	"healthbar_colors": [
-		49,
-		176,
-		209
+		249,
+		223,
+		68
 	],
 	"camera_position": [
 		0,
 		0
 	],
 	"sing_duration": 4,
-	"scale": 1
+	"scale": 1.3
 }
