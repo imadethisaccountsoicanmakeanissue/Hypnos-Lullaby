@@ -44,8 +44,6 @@ class TitleState extends MusicBeatState
 	var textGroup:FlxGroup;
 	var logoSpr:FlxSprite;
 
-	var curWacky:Array<String> = [];
-
 	var wackyImage:FlxSprite;
 
 	var easterEggEnabled:Bool = true; //Disable this to hide the easter egg
@@ -103,8 +101,6 @@ class TitleState extends MusicBeatState
 
 		PlayerSettings.init();
 
-		curWacky = FlxG.random.getObject(getIntroTextShit());
-
 		// DEBUG BULLSHIT
 
 		swagShader = new ColorSwap();
@@ -147,6 +143,7 @@ class TitleState extends MusicBeatState
 
 	var logoBl:FlxSprite;
 	var gfDance:FlxSprite;
+	var hypnoDance:FlxSprite;
 	var danceLeft:Bool = false;
 	var titleText:FlxSprite;
 	var swagShader:ColorSwap = null;
@@ -172,12 +169,12 @@ class TitleState extends MusicBeatState
 			// https://github.com/HaxeFlixel/flixel-addons/pull/348
 
 			// var music:FlxSound = new FlxSound();
-			// music.loadStream(Paths.music('freakyMenu'));
+			// music.loadStream(Paths.music('HYPNO_MENU'));
 			// FlxG.sound.list.add(music);
 			// music.play();
 
 			if(FlxG.sound.music == null) {
-				FlxG.sound.playMusic(Paths.music('freakyMenu'), 0);
+				FlxG.sound.playMusic(Paths.music('HYPNO_MENU'), 0);
 
 				FlxG.sound.music.fadeIn(4, 0, 0.7);
 			}
@@ -186,39 +183,46 @@ class TitleState extends MusicBeatState
 		Conductor.changeBPM(102);
 		persistentUpdate = true;
 
+		var constantResize:Float = 0.9;
 		var bg:FlxSprite = new FlxSprite().makeGraphic(FlxG.width, FlxG.height, FlxColor.BLACK);
 		// bg.antialiasing = ClientPrefs.globalAntialiasing;
 		// bg.setGraphicSize(Std.int(bg.width * 0.6));
 		// bg.updateHitbox();
 		add(bg);
 
-		logoBl = new FlxSprite(-150, -100);
-		logoBl.frames = Paths.getSparrowAtlas('logoBumpin');
+		hypnoDance = new FlxSprite(FlxG.width * 0.6, -200);
+		hypnoDance.frames = Paths.getSparrowAtlas('StartScreen Hypno');
+		hypnoDance.animation.addByPrefix('bop', 'Hypno StartScreen', 24, false);
+		hypnoDance.setGraphicSize(Std.int(hypnoDance.width * constantResize));
+		hypnoDance.updateHitbox();
+		//hypnoDance.setPosition(hypnoDance.x + FlxG.width * (1 - constantResize), hypnoDance.y + FlxG.height * (1 - constantResize));
+
+		hypnoDance.antialiasing = ClientPrefs.globalAntialiasing;
+		add(hypnoDance);
+
+		logoBl = new FlxSprite();
+		logoBl.frames = Paths.getSparrowAtlas('Hypno card');
 		logoBl.antialiasing = ClientPrefs.globalAntialiasing;
-		logoBl.animation.addByPrefix('bump', 'logo bumpin', 24);
+		logoBl.animation.addByPrefix('bump', 'Logo Startscreen instance 1', 24);
 		logoBl.animation.play('bump');
+		logoBl.setGraphicSize(Std.int(logoBl.width * constantResize));
 		logoBl.updateHitbox();
+		// logoBl.x += ;
+		//logoBl.y += 200;
+		add(logoBl);
 		// logoBl.screenCenter();
 		// logoBl.color = FlxColor.BLACK;
 
-		swagShader = new ColorSwap();
-		if(!FlxG.save.data.psykaEasterEgg || !easterEggEnabled) {
-			gfDance = new FlxSprite(FlxG.width * 0.4, FlxG.height * 0.07);
-			gfDance.frames = Paths.getSparrowAtlas('gfDanceTitle');
-			gfDance.animation.addByIndices('danceLeft', 'gfDance', [30, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14], "", 24, false);
-			gfDance.animation.addByIndices('danceRight', 'gfDance', [15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29], "", 24, false);
-		}
-		else //Psyka easter egg
-		{
-			gfDance = new FlxSprite(FlxG.width * 0.4, FlxG.height * 0.04);
-			gfDance.frames = Paths.getSparrowAtlas('psykaDanceTitle');
-			gfDance.animation.addByIndices('danceLeft', 'psykaDance', [30, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14], "", 24, false);
-			gfDance.animation.addByIndices('danceRight', 'psykaDance', [15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29], "", 24, false);
-		}
+		gfDance = new FlxSprite(FlxG.width * 0.4, FlxG.height * 0.4);
+		gfDance.frames = Paths.getSparrowAtlas('StartscreenGF');
+		gfDance.animation.addByPrefix('bop', 'GF Startscreen', 24, false);
+		gfDance.setGraphicSize(Std.int(gfDance.width * constantResize));
+		gfDance.updateHitbox();
+		//gfDance.setPosition(gfDance.x + FlxG.width * (1 - constantResize), gfDance.y + FlxG.height * (1 - constantResize));
+
 		gfDance.antialiasing = ClientPrefs.globalAntialiasing;
 		add(gfDance);
-		gfDance.shader = swagShader.shader;
-		add(logoBl);
+		
 		//logoBl.shader = swagShader.shader;
 
 		titleText = new FlxSprite(100, FlxG.height * 0.8);
@@ -229,7 +233,7 @@ class TitleState extends MusicBeatState
 		titleText.animation.play('idle');
 		titleText.updateHitbox();
 		// titleText.screenCenter(X);
-		add(titleText);
+		// add(titleText);
 
 		var logo:FlxSprite = new FlxSprite().loadGraphic(Paths.image('logo'));
 		logo.screenCenter();
@@ -269,21 +273,6 @@ class TitleState extends MusicBeatState
 			initialized = true;
 
 		// credGroup.add(credTextShit);
-	}
-
-	function getIntroTextShit():Array<Array<String>>
-	{
-		var fullText:String = Assets.getText(Paths.txt('introText'));
-
-		var firstArray:Array<String> = fullText.split('\n');
-		var swagGoodArray:Array<Array<String>> = [];
-
-		for (i in firstArray)
-		{
-			swagGoodArray.push(i.split('--'));
-		}
-
-		return swagGoodArray;
 	}
 
 	var transitioning:Bool = false;
@@ -450,12 +439,11 @@ class TitleState extends MusicBeatState
 			logoBl.animation.play('bump');
 
 		if(gfDance != null) {
-			danceLeft = !danceLeft;
+			gfDance.animation.play('bop');
+		}
 
-			if (danceLeft)
-				gfDance.animation.play('danceRight');
-			else
-				gfDance.animation.play('danceLeft');
+		if(hypnoDance != null) {
+			hypnoDance.animation.play('bop');
 		}
 
 		if(!closedState) {
@@ -463,50 +451,46 @@ class TitleState extends MusicBeatState
 			switch (sickBeats)
 			{
 				case 1:
-					createCoolText(['Psych Engine by'], 45);
-				// credTextShit.visible = true;
+					createCoolText(['Banbuds'], -90);
+					addMoreText('Ash', -90);
+				case 2:
+					addMoreText('Fidy50', -90);
+					addMoreText('Yoshubs', -90);
 				case 3:
-					addMoreText('Shadow Mario', 45);
-					addMoreText('RiverOaken', 45);
-				// credTextShit.text += '\npresent...';
-				// credTextShit.addText();
+					addMoreText('Uncle Jeol', -90);
+					addMoreText('TheInnuendo', -90);
 				case 4:
-					deleteCoolText();
-				// credTextShit.visible = false;
-				// credTextShit.text = 'In association \nwith';
-				// credTextShit.screenCenter();
+					addMoreText('Adam McHummus', -90);
+					addMoreText('Nimbus Cumulus', -90);
 				case 5:
-					createCoolText(['This is a mod to'], -60);
+					deleteCoolText();
+				case 6:
+					addMoreText('ChillinHenry', -45);
+					addMoreText('Sandplanet', -45);
 				case 7:
-					addMoreText('This game right below lol', -60);
-					logoSpr.visible = true;
-				// credTextShit.text += '\nNewgrounds';
+					addMoreText('ScorchVx', -45);
+					addMoreText('Mr_Nol', -45);
 				case 8:
-					deleteCoolText();
-					logoSpr.visible = false;
-				// credTextShit.visible = false;
-
-				// credTextShit.text = 'Shoutouts Tom Fulp';
-				// credTextShit.screenCenter();
+					addMoreText('typic', -45);
 				case 9:
-					createCoolText([curWacky[0]]);
-				// credTextShit.visible = true;
+					addMoreText('Present');
+	
 				case 11:
-					addMoreText(curWacky[1]);
-				// credTextShit.text += '\nlmao';
-				case 12:
 					deleteCoolText();
+					var randoTexto = FlxG.random.getObject([['Hurry'], ["Let the old man teach", "you how to catch Pokemon"], ["Do you hear his voice?"]]);
+					createCoolText(randoTexto);
+					
 				// credTextShit.visible = false;
 				// credTextShit.text = "Friday";
 				// credTextShit.screenCenter();
 				case 13:
-					addMoreText('Friday');
+					deleteCoolText();
 				// credTextShit.visible = true;
 				case 14:
-					addMoreText('Night');
+					addMoreText('Hypnos');
 				// credTextShit.text += '\nNight';
 				case 15:
-					addMoreText('Funkin'); // credTextShit.text += '\nFunkin';
+					addMoreText('Lullaby'); // credTextShit.text += '\nFunkin';
 
 				case 16:
 					skipIntro();
