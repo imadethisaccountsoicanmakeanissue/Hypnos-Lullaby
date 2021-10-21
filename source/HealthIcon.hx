@@ -50,6 +50,12 @@ class HealthIcon extends FlxSprite
 					
 					animation.addByPrefix(char, 'Hypno2 Icon', 24, true);
 					animation.play(char);
+				case 'gold':
+					var file:FlxAtlasFrames = Paths.getSparrowAtlas('icons/Gold Health Icon');
+					frames = file;
+					
+					animation.addByPrefix(char, 'Gold Icon', 24, true);
+					animation.play(char);
 				default:
 					var name:String = 'icons/' + char;
 					if(!Paths.fileExists('images/' + name + '.png', IMAGE)) name = 'icons/icon-' + char; //Older versions of psych engine's support

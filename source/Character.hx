@@ -240,6 +240,9 @@ class Character extends FlxSprite
 			{
 				playAnim(animation.curAnim.name + '-loop');
 			}
+
+			if (animation.curAnim.finished && animation.curAnim.name == 'fadeIn' && animation.getByName('idle') != null)
+				playAnim('idle');
 		}
 		super.update(elapsed);
 	}

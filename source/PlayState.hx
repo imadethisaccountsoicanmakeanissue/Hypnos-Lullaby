@@ -288,8 +288,10 @@ class PlayState extends MusicBeatState
 		if(PlayState.SONG.stage == null || PlayState.SONG.stage.length < 1) {
 			switch (songName)
 			{
-				case 'left-unchecked':
+				case 'left-unchecked' | 'safety-lullaby':
 					curStage = 'alley';
+				case 'monochrome':
+					curStage = 'lost';
 				default:
 					curStage = 'stage';
 			}
@@ -347,6 +349,8 @@ class PlayState extends MusicBeatState
 					stageCurtains.updateHitbox();
 					add(stageCurtains);
 				}
+			case 'lost':
+				// lmfao
 			case 'alley':
 				var consistentPosition:Array<Float> = [-300, -600];
 				var resizeBG:Float = 0.7;
@@ -401,11 +405,15 @@ class PlayState extends MusicBeatState
 
 		boyfriend = new Boyfriend(0, 0, SONG.player1);
 		startCharacterPos(boyfriend);
-		boyfriendGroup.add(boyfriend);
+		var camPos:FlxPoint;
+		if (SONG.player2 != 'gold') {
+			boyfriendGroup.add(boyfriend);
 		
-		var camPos:FlxPoint = new FlxPoint(boyfriend.getGraphicMidpoint().x, boyfriend.getGraphicMidpoint().y);
-		camPos.x += boyfriend.cameraPosition[0];
-		camPos.y += boyfriend.cameraPosition[1];
+			camPos = new FlxPoint(boyfriend.getGraphicMidpoint().x, boyfriend.getGraphicMidpoint().y);
+			camPos.x += boyfriend.cameraPosition[0];
+			camPos.y += boyfriend.cameraPosition[1];
+		} else 
+			camPos = new FlxPoint(dad.getGraphicMidpoint().x, dad.getGraphicMidpoint().y);
 
 		var file:String = Paths.json(songName + '/dialogue'); //Checks for json/Psych Engine dialogue
 		if (OpenFlAssets.exists(file)) {
@@ -608,19 +616,34 @@ class PlayState extends MusicBeatState
 		#end
 		
 		var daSong:String = Paths.formatToSongPath(curSong);
-		if (isStoryMode && !seenCutscene)
-		{
-			switch (daSong)
+		if (dad.curCharacter != 'gold') {
+			if (isStoryMode && !seenCutscene)
 			{
-				case 'lullaby':
-					startDialogue(dialogueJson);
-				default:
-					startCountdown();
+				switch (daSong)
+				{
+					case 'lullaby':
+						startDialogue(dialogueJson);
+					default:
+						startCountdown();
+				}
+				seenCutscene = true;
+			} else {
+				startCountdown();
 			}
-			seenCutscene = true;
 		} else {
-			startCountdown();
+			// IM DEAD
+
+			// okay now fade in
+			dad.playAnim('fadeIn', true);
+			inCutscene = false;
+			startedCountdown = true;
+			Conductor.songPosition = 0;
+			generateStaticArrows(0);
+			generateStaticArrows(1);
+
+			opponentStrums.visible = false;
 		}
+
 		RecalculateRating();
 
 		//PRECACHING MISS SOUNDS BECAUSE I THINK THEY CAN LAG PEOPLE AND FUCK THEM UP IDK HOW HAXE WORKS
@@ -1559,7 +1582,7 @@ class PlayState extends MusicBeatState
 
 		if (camZooming)
 		{
-			FlxG.camera.zoom = FlxMath.lerp(defaultCamZoom, FlxG.camera.zoom, CoolUtil.boundTo(1 - (elapsed * 3.125), 0, 1));
+			FlxG.camera.zoom = FlxMath.lerp(defaultCamZoom + resizeCamera, FlxG.camera.zoom, CoolUtil.boundTo(1 - (elapsed * 3.125), 0, 1));
 			camHUD.zoom = FlxMath.lerp(1, camHUD.zoom, CoolUtil.boundTo(1 - (elapsed * 3.125), 0, 1));
 		}
 

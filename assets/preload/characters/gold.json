@@ -2,87 +2,87 @@
 	"animations": [
 		{
 			"offsets": [
-				-150,
-				-120
+				0,
+				0
+			],
+			"loop": true,
+			"fps": 24,
+			"anim": "idle",
+			"indices": [],
+			"name": "Silver Idle"
+		},
+		{
+			"offsets": [
+				11,
+				-348
 			],
 			"loop": false,
 			"fps": 24,
 			"anim": "singDOWN",
 			"indices": [],
-			"name": "Final Hypno Down"
+			"name": "Silver Down Full"
 		},
 		{
 			"offsets": [
-				-89,
-				267
+				-3,
+				181
 			],
 			"loop": false,
 			"fps": 24,
 			"anim": "singUP",
 			"indices": [],
-			"name": "Hypno Up"
+			"name": "Full Silver Up"
 		},
 		{
 			"offsets": [
-				-338,
-				93
-			],
-			"loop": false,
-			"fps": 24,
-			"anim": "singRIGHT",
-			"indices": [],
-			"name": "Hypno Right"
-		},
-		{
-			"offsets": [
-				37,
-				11
-			],
-			"loop": false,
-			"fps": 24,
-			"anim": "firstDeath",
-			"indices": [],
-			"name": "BF dies"
-		},
-		{
-			"offsets": [
-				0,
-				0
-			],
-			"loop": false,
-			"fps": 24,
-			"anim": "idle",
-			"indices": [],
-			"name": "Hypno Idle 1"
-		},
-		{
-			"offsets": [
-				144,
-				22
+				619,
+				126
 			],
 			"loop": false,
 			"fps": 24,
 			"anim": "singLEFT",
 			"indices": [],
-			"name": "Hypno Left"
+			"name": "Lost Silver Left finished"
+		},
+		{
+			"offsets": [
+				-96,
+				91
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "singRIGHT",
+			"indices": [],
+			"name": "Silver Right Finished"
+		},
+		{
+			"loop": false,
+			"offsets": [
+				0,
+				0
+			],
+			"anim": "fadeIn",
+			"fps": 24,
+			"name": "Silver Spawn Full",
+			"indices": []
 		}
 	],
 	"no_antialiasing": false,
-	"image": "characters/Hypno Phase 1 Sheet",
+	"image": "characters/Lost Silver Assets Gold",
 	"position": [
-		-160,
-		-240
-	],
-	"healthicon": "hypno",
-	"flip_x": false,
-	"healthbar_colors": [
-		249,
-		223,
-		68
-	],
-	"camera_position": [
 		0,
 		0
+	],
+	"healthicon": "gold",
+	"flip_x": false,
+	"healthbar_colors": [
+		255,
+		255,
+		255
+	],
+	"camera_position": [
+		-207,
+		-110
 	],
 	"sing_duration": 4,
 	"scale": 1.3

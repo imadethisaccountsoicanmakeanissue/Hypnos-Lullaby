@@ -192,7 +192,8 @@ class TitleState extends MusicBeatState
 
 		hypnoDance = new FlxSprite(FlxG.width * 0.6, -200);
 		hypnoDance.frames = Paths.getSparrowAtlas('StartScreen Hypno');
-		hypnoDance.animation.addByPrefix('bop', 'Hypno StartScreen', 24, false);
+		hypnoDance.animation.addByPrefix('bop', 'Hypno StartScreen', 24, true);
+		hypnoDance.animation.play('bop');
 		hypnoDance.setGraphicSize(Std.int(hypnoDance.width * constantResize));
 		hypnoDance.updateHitbox();
 		//hypnoDance.setPosition(hypnoDance.x + FlxG.width * (1 - constantResize), hypnoDance.y + FlxG.height * (1 - constantResize));
@@ -203,7 +204,7 @@ class TitleState extends MusicBeatState
 		logoBl = new FlxSprite();
 		logoBl.frames = Paths.getSparrowAtlas('Hypno card');
 		logoBl.antialiasing = ClientPrefs.globalAntialiasing;
-		logoBl.animation.addByPrefix('bump', 'Logo Startscreen instance 1', 24);
+		logoBl.animation.addByPrefix('bump', 'Logo Startscreen instance 1', 24, true);
 		logoBl.animation.play('bump');
 		logoBl.setGraphicSize(Std.int(logoBl.width * constantResize));
 		logoBl.updateHitbox();
@@ -213,9 +214,10 @@ class TitleState extends MusicBeatState
 		// logoBl.screenCenter();
 		// logoBl.color = FlxColor.BLACK;
 
-		gfDance = new FlxSprite(FlxG.width * 0.4, FlxG.height * 0.4);
+		gfDance = new FlxSprite(FlxG.width * 0.4, FlxG.height * 0.45);
 		gfDance.frames = Paths.getSparrowAtlas('StartscreenGF');
-		gfDance.animation.addByPrefix('bop', 'GF Startscreen', 24, false);
+		gfDance.animation.addByPrefix('bop', 'GF Startscreen', 24, true);
+		gfDance.animation.play('bop');
 		gfDance.setGraphicSize(Std.int(gfDance.width * constantResize));
 		gfDance.updateHitbox();
 		//gfDance.setPosition(gfDance.x + FlxG.width * (1 - constantResize), gfDance.y + FlxG.height * (1 - constantResize));
@@ -434,17 +436,6 @@ class TitleState extends MusicBeatState
 	override function beatHit()
 	{
 		super.beatHit();
-
-		if(logoBl != null) 
-			logoBl.animation.play('bump');
-
-		if(gfDance != null) {
-			gfDance.animation.play('bop');
-		}
-
-		if(hypnoDance != null) {
-			hypnoDance.animation.play('bop');
-		}
 
 		if(!closedState) {
 			sickBeats++;
