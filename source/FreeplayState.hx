@@ -42,8 +42,6 @@ class FreeplayState extends MusicBeatState
 	private var iconArray:Array<HealthIcon> = [];
 
 	var bg:FlxSprite;
-	var intendedColor:Int;
-	var colorTween:FlxTween;
 
 	override function create()
 	{
@@ -56,6 +54,7 @@ class FreeplayState extends MusicBeatState
 		DiscordClient.changePresence("In the Menus", null);
 		#end
 
+		/*
 		for (i in 0...WeekData.weeksList.length) {
 			var leWeek:WeekData = WeekData.weeksLoaded.get(WeekData.weeksList[i]);
 			var leSongs:Array<String> = [];
@@ -76,6 +75,7 @@ class FreeplayState extends MusicBeatState
 		}
 		WeekData.setDirectoryFromWeek();
 
+		
 		var initSonglist = CoolUtil.coolTextFile(Paths.txt('freeplaySonglist'));
 		for (i in 0...initSonglist.length)
 		{
@@ -84,14 +84,23 @@ class FreeplayState extends MusicBeatState
 				addSong(songArray[0], 0, songArray[1], Std.parseInt(songArray[2]));
 			}
 		}
+		*/
+
+		addSong('Safety Lullaby', 0, 'hypno', 0xFF000000);
+		addSong('Left Unchecked', 0, 'hypno2', 0xFF000000);
 
 		// LOAD MUSIC
 
 		// LOAD CHARACTERS
 
-		bg = new FlxSprite().loadGraphic(Paths.image('menuDesat'));
-		bg.antialiasing = ClientPrefs.globalAntialiasing;
-		add(bg);
+		var menuGF:FlxSprite = new FlxSprite();
+		menuGF.frames = Paths.getSparrowAtlas('FreeplayGF');
+		menuGF.animation.addByPrefix('bop', 'MenuGF', 24, true);
+		menuGF.animation.play('bop');
+		menuGF.setGraphicSize(Std.int(menuGF.width * 5/6));
+		menuGF.updateHitbox();
+		menuGF.setPosition(FlxG.width - menuGF.width + 100, FlxG.height - menuGF.height + 100);
+		add(menuGF);
 
 		grpSongs = new FlxTypedGroup<Alphabet>();
 		add(grpSongs);
@@ -131,8 +140,7 @@ class FreeplayState extends MusicBeatState
 		add(scoreText);
 
 		if(curSelected >= songs.length) curSelected = 0;
-		bg.color = songs[curSelected].color;
-		intendedColor = bg.color;
+
 		changeSelection();
 		changeDiff();
 
@@ -240,9 +248,6 @@ class FreeplayState extends MusicBeatState
 
 		if (controls.BACK)
 		{
-			if(colorTween != null) {
-				colorTween.cancel();
-			}
 			FlxG.sound.play(Paths.sound('cancelMenu'));
 			MusicBeatState.switchState(new MainMenuState());
 		}
@@ -288,9 +293,6 @@ class FreeplayState extends MusicBeatState
 
 			PlayState.storyWeek = songs[curSelected].week;
 			trace('CURRENT WEEK: ' + WeekData.getWeekFileName());
-			if(colorTween != null) {
-				colorTween.cancel();
-			}
 			LoadingState.loadAndSwitchState(new PlayState());
 
 			FlxG.sound.music.volume = 0;
@@ -342,19 +344,6 @@ class FreeplayState extends MusicBeatState
 			curSelected = songs.length - 1;
 		if (curSelected >= songs.length)
 			curSelected = 0;
-
-		var newColor:Int = songs[curSelected].color;
-		if(newColor != intendedColor) {
-			if(colorTween != null) {
-				colorTween.cancel();
-			}
-			intendedColor = newColor;
-			colorTween = FlxTween.color(bg, 1, bg.color, intendedColor, {
-				onComplete: function(twn:FlxTween) {
-					colorTween = null;
-				}
-			});
-		}
 
 		// selector.y = (70 * curSelected) + 30;
 

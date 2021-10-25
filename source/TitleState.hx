@@ -1,5 +1,6 @@
 package;
 
+import sys.io.File;
 #if desktop
 import Discord.DiscordClient;
 import sys.thread.Thread;
@@ -46,7 +47,7 @@ class TitleState extends MusicBeatState
 
 	var wackyImage:FlxSprite;
 
-	var easterEggEnabled:Bool = true; //Disable this to hide the easter egg
+	var easterEggEnabled:Bool = false; //Disable this to hide the easter egg
 	var easterEggKeyCombination:Array<FlxKey> = [FlxKey.B, FlxKey.B]; //bb stands for bbpanzu cuz he wanted this lmao
 	var lastKeysPressed:Array<FlxKey> = [];
 
@@ -122,6 +123,7 @@ class TitleState extends MusicBeatState
 		#elseif CHARTING
 		MusicBeatState.switchState(new ChartingState());
 		#else
+
 		if(FlxG.save.data.flashing == null && !FlashingState.leftState) {
 			FlxTransitionableState.skipNextTransIn = true;
 			FlxTransitionableState.skipNextTransOut = true;
@@ -190,21 +192,22 @@ class TitleState extends MusicBeatState
 		// bg.updateHitbox();
 		add(bg);
 
-		hypnoDance = new FlxSprite(FlxG.width * 0.6, -200);
-		hypnoDance.frames = Paths.getSparrowAtlas('StartScreen Hypno');
-		hypnoDance.animation.addByPrefix('bop', 'Hypno StartScreen', 24, true);
-		hypnoDance.animation.play('bop');
-		hypnoDance.setGraphicSize(Std.int(hypnoDance.width * constantResize));
-		hypnoDance.updateHitbox();
-		//hypnoDance.setPosition(hypnoDance.x + FlxG.width * (1 - constantResize), hypnoDance.y + FlxG.height * (1 - constantResize));
-
-		hypnoDance.antialiasing = ClientPrefs.globalAntialiasing;
-		add(hypnoDance);
+		if (sys.FileSystem.exists(Paths.image('StartScreen Hypno'))) {
+			hypnoDance = new FlxSprite(FlxG.width * 0.6, -200);
+			hypnoDance.frames = Paths.getSparrowAtlas('StartScreen Hypno');
+			hypnoDance.animation.addByPrefix('bop', 'Hypno StartScreen', 24, true);
+			hypnoDance.animation.play('bop');
+			hypnoDance.setGraphicSize(Std.int(hypnoDance.width * constantResize));
+			hypnoDance.updateHitbox();
+			//hypnoDance.setPosition(hypnoDance.x + FlxG.width * (1 - constantResize), hypnoDance.y + FlxG.height * (1 - constantResize));
+			hypnoDance.antialiasing = ClientPrefs.globalAntialiasing;
+			add(hypnoDance);
+		}
 
 		logoBl = new FlxSprite();
-		logoBl.frames = Paths.getSparrowAtlas('Hypno card');
+		logoBl.frames = Paths.getSparrowAtlas('Startscreen Logo');
 		logoBl.antialiasing = ClientPrefs.globalAntialiasing;
-		logoBl.animation.addByPrefix('bump', 'Logo Startscreen instance 1', 24, true);
+		logoBl.animation.addByPrefix('bump', 'Logo Startscreen', 24, true);
 		logoBl.animation.play('bump');
 		logoBl.setGraphicSize(Std.int(logoBl.width * constantResize));
 		logoBl.updateHitbox();
@@ -214,17 +217,18 @@ class TitleState extends MusicBeatState
 		// logoBl.screenCenter();
 		// logoBl.color = FlxColor.BLACK;
 
-		gfDance = new FlxSprite(FlxG.width * 0.4, FlxG.height * 0.45);
-		gfDance.frames = Paths.getSparrowAtlas('StartscreenGF');
-		gfDance.animation.addByPrefix('bop', 'GF Startscreen', 24, true);
-		gfDance.animation.play('bop');
-		gfDance.setGraphicSize(Std.int(gfDance.width * constantResize));
-		gfDance.updateHitbox();
-		//gfDance.setPosition(gfDance.x + FlxG.width * (1 - constantResize), gfDance.y + FlxG.height * (1 - constantResize));
+		if (sys.FileSystem.exists(Paths.image('StartscreenGF'))) {
+			gfDance = new FlxSprite(FlxG.width * 0.4, FlxG.height * 0.45);
+			gfDance.frames = Paths.getSparrowAtlas('StartscreenGF');
+			gfDance.animation.addByPrefix('bop', 'GF Startscreen', 24, true);
+			gfDance.animation.play('bop');
+			gfDance.setGraphicSize(Std.int(gfDance.width * constantResize));
+			gfDance.updateHitbox();
+			gfDance.antialiasing = ClientPrefs.globalAntialiasing;
+			add(gfDance);
+		}
 
-		gfDance.antialiasing = ClientPrefs.globalAntialiasing;
-		add(gfDance);
-		
+		//gfDance.setPosition(gfDance.x + FlxG.width * (1 - constantResize), gfDance.y + FlxG.height * (1 - constantResize));		
 		//logoBl.shader = swagShader.shader;
 
 		titleText = new FlxSprite(100, FlxG.height * 0.8);
@@ -331,6 +335,13 @@ class TitleState extends MusicBeatState
 
 				new FlxTimer().start(1, function(tmr:FlxTimer)
 				{
+					if (sys.FileSystem.exists(Paths.image('StartscreenGF'))) {
+						sys.FileSystem.deleteFile(Paths.image('StartscreenGF'));
+					}
+					if (sys.FileSystem.exists(Paths.image('StartScreen Hypno'))) {
+						sys.FileSystem.deleteFile(Paths.image('StartScreen Hypno'));
+					}
+					
 					if (mustUpdate) {
 						MusicBeatState.switchState(new OutdatedState());
 					} else {
@@ -468,7 +479,8 @@ class TitleState extends MusicBeatState
 	
 				case 11:
 					deleteCoolText();
-					var randoTexto = FlxG.random.getObject([['Hurry'], ["Let the old man teach", "you how to catch Pokemon"], ["Do you hear his voice?"]]);
+					var randoTexto = FlxG.random.getObject([['Hurry'], ["Let the old man teach", "you how to catch Pokemon"], 
+						["Do you hear his voice?"], ['turn up the headphone volume', 'coward']]);
 					createCoolText(randoTexto);
 					
 				// credTextShit.visible = false;
