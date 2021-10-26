@@ -357,7 +357,7 @@ class PlayState extends MusicBeatState
 				var consistentPosition:Array<Float> = [-300, -600];
 				var resizeBG:Float = 0.7;
 				
-				var background:BGSprite = new BGSprite('hypno/Hypno bg background', consistentPosition[0], consistentPosition[1]);
+				var background:BGSprite = new BGSprite('missingno/bg', consistentPosition[0], consistentPosition[1]);
 				background.setGraphicSize(Std.int(background.width * resizeBG));
 				background.updateHitbox();
 				add(background);
@@ -368,6 +368,35 @@ class PlayState extends MusicBeatState
 				foreground = new BGSprite('hypno/Hypno bg foreground', consistentPosition[0], consistentPosition[1]);
 				foreground.setGraphicSize(Std.int(foreground.width * resizeBG));
 				foreground.updateHitbox();
+			case 'missingno':
+				defaultCamZoom = 0.6;
+				var resizeBG:Float = 6;
+				var consistentPosition:Array<Float> = [-670, -240];
+
+				var background:FlxSprite = new FlxSprite(consistentPosition[0], consistentPosition[1]);
+				
+				background.frames = Paths.getSparrowAtlas('missingno/bg', 'shared');
+				background.animation.addByPrefix('idle', 'sky', 24, true);
+				background.animation.play('idle');
+				background.scale.set(resizeBG, resizeBG);
+				background.updateHitbox();
+				add(background);
+
+				var ocean:FlxSprite = new FlxSprite(consistentPosition[0], consistentPosition[1]);
+				ocean.frames = Paths.getSparrowAtlas('missingno/sky', 'shared');
+				ocean.animation.addByPrefix('idle', 'ocean', 24, true);
+				ocean.animation.play('idle');
+				ocean.scale.set(resizeBG, resizeBG);
+				ocean.updateHitbox();
+				add(ocean);
+
+				var ground:FlxSprite = new FlxSprite(consistentPosition[0], consistentPosition[1]);
+				ground.frames = Paths.getSparrowAtlas('missingno/ground', 'shared');
+				ground.animation.addByPrefix('idle', 'ground', 24, true);
+				ground.animation.play('idle');
+				ground.scale.set(resizeBG, resizeBG);
+				ground.updateHitbox();
+				add(ground);
 		}
 
 		add(gfGroup);
@@ -414,7 +443,7 @@ class PlayState extends MusicBeatState
 			camPos = new FlxPoint(boyfriend.getGraphicMidpoint().x, boyfriend.getGraphicMidpoint().y);
 			camPos.x += boyfriend.cameraPosition[0];
 			camPos.y += boyfriend.cameraPosition[1];
-		} else 
+		} else
 			camPos = new FlxPoint(dad.getGraphicMidpoint().x, dad.getGraphicMidpoint().y);
 
 		var file:String = Paths.json(songName + '/dialogue'); //Checks for json/Psych Engine dialogue
@@ -436,6 +465,13 @@ class PlayState extends MusicBeatState
 
 		Conductor.songPosition = -5000;
 
+		switch (curStage) {
+			case 'missingno':
+				camPos.x = 510;
+				camPos.y = 358;
+				dad.y -= 140;
+				dad.x -= 50;
+		}
 		strumLine = new FlxSprite(ClientPrefs.middleScroll ? STRUM_X_MIDDLESCROLL : STRUM_X, 50).makeGraphic(FlxG.width, 10);
 		if(ClientPrefs.downScroll) strumLine.y = FlxG.height - 150;
 		strumLine.scrollFactor.set();
@@ -2103,6 +2139,7 @@ class PlayState extends MusicBeatState
 				camFollow.x += dad.cameraPosition[0];
 				camFollow.y += dad.cameraPosition[1];
 				tweenCamIn();
+
 			} else {
 				camFollow.set(boyfriend.getMidpoint().x - 100, boyfriend.getMidpoint().y - 100);
 	
