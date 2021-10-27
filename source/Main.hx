@@ -66,7 +66,7 @@ class Main extends Sprite
 		}
 
 		#if !debug
-		initialState = TitleState;
+		initialState = PreloadState;
 		#end
 
 		Paths.getModFolders();
