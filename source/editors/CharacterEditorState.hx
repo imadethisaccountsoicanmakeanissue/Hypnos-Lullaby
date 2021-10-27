@@ -56,6 +56,9 @@ class CharacterEditorState extends MusicBeatState
 	var goToPlayState:Bool = true;
 	var camFollow:FlxObject;
 
+	var pendulum:FlxSprite;
+	var pendulumOffset:Array<Int> = [];
+
 	public function new(daAnim:String = 'spooky', goToPlayState:Bool = true)
 	{
 		super();
@@ -135,6 +138,16 @@ class CharacterEditorState extends MusicBeatState
 		textAnim.cameras = [camHUD];
 		add(textAnim);
 
+		pendulum = new FlxSprite();
+		pendulum.frames = Paths.getSparrowAtlas('hypno/Pendelum', 'shared');
+		pendulum.animation.addByPrefix('idle', 'Pendelum instance 1', 24, true);
+		pendulum.animation.play('idle');
+		
+		pendulum.scale.set(1.3, 1.3);
+		pendulum.updateHitbox();
+		pendulum.origin.set(65, 0);
+		add(pendulum);
+		
 		genBoyOffsets();
 
 		camFollow = new FlxObject(0, 0, 2, 2);
@@ -198,6 +211,9 @@ class CharacterEditorState extends MusicBeatState
 		reloadCharacterOptions();
 
 		super.create();
+
+		
+		
 	}
 
 	var onPixelBG:Bool = false;
@@ -751,6 +767,20 @@ class CharacterEditorState extends MusicBeatState
 			daLoop++;
 		}
 
+		var text:FlxText = new FlxText(10, 20 + (18 * daLoop), 0, "pendulumOffset: " + pendulumOffset[0] + ', ' + pendulumOffset[1] + ', angle: ' + pendulum.angle, 15);
+		text.setFormat(null, 16, FlxColor.WHITE, CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
+		text.scrollFactor.set();
+		text.borderSize = 1;
+		dumbTexts.add(text);
+		daLoop++;
+
+		var text:FlxText = new FlxText(10, 20 + (18 * daLoop), 0, "current frame: " + char.animation.curAnim.curFrame , 15);
+		text.setFormat(null, 16, FlxColor.WHITE, CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
+		text.scrollFactor.set();
+		text.borderSize = 1;
+		dumbTexts.add(text);
+		daLoop++;
+
 		textAnim.visible = true;
 		if(dumbTexts.length < 1) {
 			var text:FlxText = new FlxText(10, 38, 0, "ERROR! No animations found.", 15);
@@ -1061,6 +1091,52 @@ class CharacterEditorState extends MusicBeatState
 						}
 						genBoyOffsets();
 					}
+				}
+
+				var pendulumControlArray:Array<Bool> = [FlxG.keys.justPressed.V, FlxG.keys.justPressed.N, FlxG.keys.justPressed.G, FlxG.keys.justPressed.B];
+				for (i in 0...pendulumControlArray.length) {
+					if(pendulumControlArray[i]) {
+						var holdShift = FlxG.keys.pressed.SHIFT;
+						var multiplier = 1;
+						if (holdShift)
+							multiplier = 10;
+						switch (i) {
+							case 0:
+								pendulumOffset[0] -= multiplier;
+							case 1:
+								pendulumOffset[0] += multiplier;
+							case 2:
+								pendulumOffset[1] -= multiplier;
+							case 3:
+								pendulumOffset[1] += multiplier;
+						}
+						pendulum.x = char.x + pendulumOffset[0];
+						pendulum.y = char.y + pendulumOffset[1];
+						genBoyOffsets();
+					}
+				}
+				if (FlxG.keys.pressed.M) {
+					char.animation.pause();
+					char.animation.curAnim.curFrame = 0;
+					genBoyOffsets();
+				}
+
+				if (FlxG.keys.pressed.C) {
+					pendulum.angle++;
+					genBoyOffsets();
+				}
+
+				if (FlxG.keys.pressed.X) {
+					pendulum.angle--;
+					genBoyOffsets();
+				}
+				if (FlxG.keys.justPressed.COMMA) {
+					char.animation.curAnim.curFrame--;
+					genBoyOffsets();
+				}
+				if (FlxG.keys.justPressed.PERIOD) {
+					char.animation.curAnim.curFrame++;
+					genBoyOffsets();
 				}
 			}
 		}

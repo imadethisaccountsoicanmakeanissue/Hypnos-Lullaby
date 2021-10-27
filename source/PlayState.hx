@@ -228,6 +228,8 @@ class PlayState extends MusicBeatState
 	private var luaDebugGroup:FlxTypedGroup<DebugLuaText>;
 	public var introSoundsSuffix:String = '';
 
+	var pendulum:Pendulum;
+
 	override public function create()
 	{
 		#if MODS_ALLOWED
@@ -689,6 +691,18 @@ class PlayState extends MusicBeatState
 		DiscordClient.changePresence(detailsText, SONG.song + " (" + storyDifficultyText + ")", iconP2.getCharacter());
 		#end
 		super.create();
+
+		pendulum = new Pendulum();
+		pendulum.frames = Paths.getSparrowAtlas('hypno/Pendelum', 'shared');
+		pendulum.animation.addByPrefix('idle', 'Pendelum instance 1', 24, true);
+		pendulum.animation.play('idle');
+		
+		pendulum.scale.set(1.3, 1.3);
+		pendulum.updateHitbox();
+		pendulum.origin.set(65, 0);
+		pendulum.angle = -9;
+		if (SONG.player2 == 'hypno')
+			add(pendulum);
 	}
 
 	public function addTextToDebug(text:String) {
@@ -1091,6 +1105,17 @@ class PlayState extends MusicBeatState
 	var lastReportedPlayheadPosition:Int = 0;
 	var songTime:Float = 0;
 
+	function pendulumSwing() {
+		pendulum.daTween = FlxTween.tween(pendulum, {angle: 21}, Conductor.stepCrochet * 4 / 1000, {ease: FlxEase.quadOut, onComplete: function (twn:FlxTween) {
+			pendulum.daTween = FlxTween.tween(pendulum, {angle: -9}, Conductor.stepCrochet * 4 / 1000, {ease: FlxEase.quadIn, onComplete: function (twn:FlxTween) {
+				pendulum.daTween = FlxTween.tween(pendulum, {angle: -39}, Conductor.stepCrochet * 4 / 1000, {ease: FlxEase.quadOut, onComplete: function (twn:FlxTween) {
+					pendulum.daTween = FlxTween.tween(pendulum, {angle: -9}, Conductor.stepCrochet * 4 / 1000, {ease: FlxEase.quadIn, onComplete: function (twn:FlxTween) {
+						pendulumSwing();
+					}});
+				}});
+			}});
+		}});
+	}
 	function startSong():Void
 	{
 		startingSong = false;
@@ -1106,8 +1131,9 @@ class PlayState extends MusicBeatState
 			//trace('Oopsie doopsie! Paused sound');
 			FlxG.sound.music.pause();
 			vocals.pause();
-		}
-
+		} else
+			pendulumSwing();
+		
 		// Song duration in a float, useful for the time left feature
 		songLength = FlxG.sound.music.length;
 		FlxTween.tween(timeBar, {alpha: 1}, 0.5, {ease: FlxEase.circOut});
@@ -1333,6 +1359,7 @@ class PlayState extends MusicBeatState
 	{
 		if (paused)
 		{
+			pendulum.daTween.cancel();
 			if (FlxG.sound.music != null)
 			{
 				FlxG.sound.music.pause();
@@ -1633,6 +1660,138 @@ class PlayState extends MusicBeatState
 			trace("RESET = True");
 		}
 		doDeathCheck();
+
+		var pendulumOffset:Array<Int> = [];
+		switch (dad.animation.name) {
+			case 'idle':
+				switch (dad.animation.curAnim.curFrame) {
+					case 0 | 1:
+						pendulumOffset[0] = 814;
+						pendulumOffset[1] = 264;
+					case 2 | 3:
+						pendulumOffset[0] = 813;
+						pendulumOffset[1] = 270;
+					case 4:
+						pendulumOffset[0] = 813;
+						pendulumOffset[1] = 266;
+					case 5:
+						pendulumOffset[0] = 813;
+						pendulumOffset[1] = 263;
+					case 6:
+						pendulumOffset[0] = 814;
+						pendulumOffset[1] = 255;
+					case 7:
+						pendulumOffset[0] = 811;
+						pendulumOffset[1] = 251;
+					case 8 | 9:
+						pendulumOffset[0] = 809;
+						pendulumOffset[1] = 249;
+					case 10 | 11 | 12 | 13 | 14:
+						pendulumOffset[0] = 808;
+						pendulumOffset[1] = 248;
+				}
+			case 'singLEFT':
+				switch (dad.animation.curAnim.curFrame) {
+					case 0:
+						pendulumOffset[0] = 775;
+						pendulumOffset[1] = 336;
+					case 1:
+						pendulumOffset[0] = 790;
+						pendulumOffset[1] = 351;
+					case 2:
+						pendulumOffset[0] = 826;
+						pendulumOffset[1] = 366;
+					case 3 | 4:
+						pendulumOffset[0] = 830;
+						pendulumOffset[1] = 378;
+					case 5 | 6:
+						pendulumOffset[0] = 831;
+						pendulumOffset[1] = 393;
+					case 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17:
+						pendulumOffset[0] = 832;
+						pendulumOffset[1] = 396;
+				}
+			case 'singRIGHT':
+				switch (dad.animation.curAnim.curFrame) {
+					case 0 | 1 | 2:
+						pendulumOffset[0] = 866;
+						pendulumOffset[1] = 609;
+					case 3:
+						pendulumOffset[0] = 858;
+						pendulumOffset[1] = 612;
+					case 4:
+						pendulumOffset[0] = 881;
+						pendulumOffset[1] = 610;
+					case 5:
+						pendulumOffset[0] = 901;
+						pendulumOffset[1] = 597;
+					case 6:
+						pendulumOffset[0] = 903;
+						pendulumOffset[1] = 590;
+					case 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17:
+						pendulumOffset[0] = 908;
+						pendulumOffset[1] = 586;
+				}
+			case 'singUP':
+				switch (dad.animation.curAnim.curFrame) {
+					case 0:
+						pendulumOffset[0] = 638;
+						pendulumOffset[1] = -300;
+					case 1:
+						pendulumOffset[0] = 675;
+						pendulumOffset[1] = -267;
+					case 2:
+						pendulumOffset[0] = 681;
+						pendulumOffset[1] = -257;
+					case 3:
+						pendulumOffset[0] = 694;
+						pendulumOffset[1] = -249;
+					case 4:
+						pendulumOffset[0] = 696;
+						pendulumOffset[1] = -241;
+					case 5:
+						pendulumOffset[0] = 705;
+						pendulumOffset[1] = -237;
+					case 6 | 7:
+						pendulumOffset[0] = 709;
+						pendulumOffset[1] = -236;
+					case 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17:
+						pendulumOffset[0] = 711;
+						pendulumOffset[1] = -234;
+				}
+			case 'singDOWN':
+				switch (dad.animation.curAnim.curFrame) {
+					case 0:
+						pendulumOffset[0] = 700;
+						pendulumOffset[1] = 222;
+					case 1:
+						pendulumOffset[0] = 705;
+						pendulumOffset[1] = 237;
+					case 2:
+						pendulumOffset[0] = 692;
+						pendulumOffset[1] = 220;
+					case 3 | 4:
+						pendulumOffset[0] = 687;
+						pendulumOffset[1] = 213;
+					case 5:
+						pendulumOffset[0] = 690;
+						pendulumOffset[1] = 220;
+					case 6:
+						pendulumOffset[0] = 689;
+						pendulumOffset[1] = 227;
+					case 7:
+						pendulumOffset[0] = 680;
+						pendulumOffset[1] = 242;
+					case 8:
+						pendulumOffset[0] = 679;
+						pendulumOffset[1] = 243;
+					case 9 | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17:
+						pendulumOffset[0] = 673;
+						pendulumOffset[1] = 253;
+				}
+		}
+		pendulum.x = dad.x + pendulumOffset[0];
+		pendulum.y = dad.y + pendulumOffset[1];
 
 		var roundedSpeed:Float = FlxMath.roundDecimal(SONG.speed, 2);
 		if (unspawnNotes[0] != null)
@@ -2965,6 +3124,13 @@ class PlayState extends MusicBeatState
 	{
 		super.beatHit();
 
+		if (SONG.player2 == 'hypno') {
+			if (!pendulum.daTween.active) {
+				pendulum.angle = -9;
+				pendulumSwing();
+
+			}
+		}
 		if(lastBeatHit >= curBeat) {
 			trace('BEAT HIT: ' + curBeat + ', LAST HIT: ' + lastBeatHit);
 			return;
@@ -3171,4 +3337,14 @@ class PlayState extends MusicBeatState
 
 	var curLight:Int = 0;
 	var curLightEvent:Int = 0;
+}
+
+class Pendulum extends FlxSprite
+{
+	public var daTween:FlxTween;
+	public function new()
+	{
+		super();
+		daTween = FlxTween.tween(this, {x: this.x}, 0.001, {});
+	}
 }
