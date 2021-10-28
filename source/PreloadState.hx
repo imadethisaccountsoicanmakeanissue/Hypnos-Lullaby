@@ -30,9 +30,11 @@ class PreloadState extends FlxState {
     ];
     var maxCount:Int;
 
-    public static var preloadedAssets:Map<String, Dynamic>;
+    public static var preloadedAssets:Map<String, FlxGraphic>;
     var backgroundGroup:FlxTypedGroup<FlxSprite>;
     var bg:FlxSprite;
+
+    public static var unlockedSongs:Array<Bool> = [false, false];
 
     override public function create() {
         super.create();
@@ -88,6 +90,14 @@ class PreloadState extends FlxState {
             });
         });
 
+        // save bullshit
+        if(FlxG.save.data != null) {
+            if (FlxG.save.data.silverUnlock != null)
+                unlockedSongs[0] = FlxG.save.data.silverUnlock;
+            if (FlxG.save.data.missingnoUnlock != null)
+                unlockedSongs[1] = FlxG.save.data.missingnoUnlock;
+        }
+
         loadText = new FlxText(5, FlxG.height - (32 + 5), 0, 'Loading...', 32);
 		loadText.setFormat("VCR OSD Mono", 16, FlxColor.WHITE, LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 		add(loadText);
@@ -106,17 +116,16 @@ class PreloadState extends FlxState {
             trace('calling asset $i');
 
             FlxGraphic.defaultPersist = true;
-            var savedGraphic:Dynamic;
             switch(assetStack[i]) {
                 case PreloadType.image:
-                    savedGraphic = FlxG.bitmap.add(Paths.image(i, 'shared'));
+                    var savedGraphic:FlxGraphic = FlxG.bitmap.add(Paths.image(i, 'shared'));
                     preloadedAssets.set(i, savedGraphic);
                     trace(savedGraphic + ', yeah its working');
                 case PreloadType.atlas:
                     var preloadedCharacter:Character = new Character(FlxG.width / 2, FlxG.height / 2, i);
+                    preloadedCharacter.visible = false;
                     add(preloadedCharacter);
                     trace('character loaded ${preloadedCharacter.frames}');
-                    preloadedCharacter.visible = false;
             }
             FlxGraphic.defaultPersist = false;
         

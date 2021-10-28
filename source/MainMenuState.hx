@@ -1,5 +1,6 @@
 package;
 
+import flixel.util.FlxTimer;
 #if desktop
 import Discord.DiscordClient;
 #end
@@ -31,7 +32,7 @@ class MainMenuState extends MusicBeatState
 	private var camGame:FlxCamera;
 	private var camAchievement:FlxCamera;
 	
-	var optionShit:Array<String> = ['story', 'freeplay', 'credits', 'options'];
+	var optionShit:Array<String> = ['story', 'freeplay', 'options'];
 
 	var magenta:FlxSprite;
 	var camFollow:FlxObject;
@@ -70,7 +71,7 @@ class MainMenuState extends MusicBeatState
 		add(menuHypno);
 
 		for (i in 0...optionShit.length) {
-			var newAlphabet:Alphabet = new Alphabet(0, 50 + ((i + 1) * 100), optionShit[i], true);
+			var newAlphabet:Alphabet = new Alphabet(0, 75 + ((i + 1) * 100), optionShit[i], true);
 			newAlphabet.x = 30;
 			newAlphabet.alpha = 0.6;
 			newAlphabet.ID = i;
@@ -118,6 +119,7 @@ class MainMenuState extends MusicBeatState
 	*/
 
 	var lastCurSelected:Int = 0;
+	var curDifficulty:Int = 2;
 
 	override function update(elapsed:Float)
 	{
@@ -206,7 +208,26 @@ class MainMenuState extends MusicBeatState
 						switch (daChoice)
 						{
 							case 'story':
-								MusicBeatState.switchState(new StoryMenuState());
+								// Nevermind that's stupid lmao
+								PlayState.storyPlaylist = ["Safety Lullaby", "Left Unchecked"];
+								PlayState.isStoryMode = true;
+
+								var diffic = CoolUtil.difficultyStuff[curDifficulty][1];
+								if (diffic == null) 
+									diffic = '';
+
+								PlayState.storyDifficulty = curDifficulty;
+
+								PlayState.SONG = Song.loadFromJson(PlayState.storyPlaylist[0].toLowerCase() + diffic, PlayState.storyPlaylist[0].toLowerCase());
+								PlayState.storyWeek = 1;
+								PlayState.campaignScore = 0;
+								PlayState.campaignMisses = 0;
+								new FlxTimer().start(0.5, function(tmr:FlxTimer)
+								{
+									LoadingState.loadAndSwitchState(new PlayState());
+									FlxG.sound.music.volume = 0;
+									FreeplayState.destroyFreeplayVocals();
+								});
 							case 'freeplay':
 								MusicBeatState.switchState(new FreeplayState());
 							case 'options':

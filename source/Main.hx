@@ -65,10 +65,7 @@ class Main extends Sprite
 			gameHeight = Math.ceil(stageHeight / zoom);
 		}
 
-		#if !debug
 		initialState = PreloadState;
-		#end
-
 		Paths.getModFolders();
 		ClientPrefs.startControls();
 		addChild(new FlxGame(gameWidth, gameHeight, initialState, zoom, framerate, framerate, skipSplash, startFullscreen));

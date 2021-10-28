@@ -282,7 +282,7 @@ class PlayState extends MusicBeatState
 		// String that contains the mode defined here so it isn't necessary to call changePresence for each mode
 		if (isStoryMode)
 		{
-			detailsText = "Story Mode: " + WeekData.getCurrentWeek().weekName;
+			detailsText = "Story Mode: Hypno's Lullaby";
 		}
 		else
 		{
@@ -366,6 +366,7 @@ class PlayState extends MusicBeatState
 			case 'alley':
 				var consistentPosition:Array<Float> = [-300, -600];
 				var resizeBG:Float = 0.7;
+				defaultCamZoom = 0.7;
 				
 				var background:BGSprite = new BGSprite(null, consistentPosition[0], consistentPosition[1]);
 				background.loadGraphic(PreloadState.preloadedAssets['hypno/Hypno bg background']);
@@ -2566,19 +2567,12 @@ class PlayState extends MusicBeatState
 					if(FlxTransitionableState.skipNextTransIn) {
 						CustomFadeTransition.nextCamera = null;
 					}
-					MusicBeatState.switchState(new StoryMenuState());
+					MusicBeatState.switchState(new MainMenuState());
 
 					// if ()
 					if(!usedPractice) {
-						StoryMenuState.weekCompleted.set(WeekData.weeksList[storyWeek], true);
-
 						if (SONG.validScore)
-						{
-							Highscore.saveWeekScore(WeekData.getWeekFileName(), campaignScore, storyDifficulty);
-						}
-
-						FlxG.save.data.weekCompleted = StoryMenuState.weekCompleted;
-						FlxG.save.flush();
+							Highscore.saveWeekScore('hypno', campaignScore, storyDifficulty);
 					}
 					usedPractice = false;
 					changedDifficulty = false;
@@ -2591,7 +2585,7 @@ class PlayState extends MusicBeatState
 					trace('LOADING NEXT SONG');
 					trace(Paths.formatToSongPath(PlayState.storyPlaylist[0]) + difficulty);
 
-					var winterHorrorlandNext = (Paths.formatToSongPath(SONG.song) == "eggnog");
+					var winterHorrorlandNext = (Paths.formatToSongPath(SONG.song) == "Safety-Lullaby");
 					if (winterHorrorlandNext)
 					{
 						var blackShit:FlxSprite = new FlxSprite(-FlxG.width * FlxG.camera.zoom,
@@ -2600,7 +2594,7 @@ class PlayState extends MusicBeatState
 						add(blackShit);
 						camHUD.visible = false;
 
-						FlxG.sound.play(Paths.sound('Lights_Shut_off'));
+						FlxG.sound.play(Paths.sound('transitionSplatter'));
 					}
 
 					FlxTransitionableState.skipNextTransIn = true;
@@ -2703,9 +2697,7 @@ class PlayState extends MusicBeatState
 			score = -50;
 			healthMultiplier = -1;
 			songMisses++;
-
 			combo = 0;
-			popUpScore(note);
 		}
 		else if (noteDiff > 100)
 		{

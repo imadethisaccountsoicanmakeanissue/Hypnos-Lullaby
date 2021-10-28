@@ -40,13 +40,31 @@ class OptionsState extends MusicBeatState
 		DiscordClient.changePresence("Options Menu", null);
 		#end
 
-		menuBG = new FlxSprite().loadGraphic(Paths.image('menuDesat'));
-		menuBG.color = 0xFFea71fd;
-		menuBG.setGraphicSize(Std.int(menuBG.width * 1.1));
-		menuBG.updateHitbox();
-		menuBG.screenCenter();
-		menuBG.antialiasing = ClientPrefs.globalAntialiasing;
-		add(menuBG);
+		// unown bg
+		var resizeConstant:Float = 4/5;
+		var sleft:FlxSprite = new FlxSprite(78, 120);
+		sleft.frames = Paths.getSparrowAtlas('S Unown');
+		sleft.animation.addByPrefix('static', 'S Unown', 24, true);
+		sleft.animation.play('static');
+		// sleft.setGraphicSize(Std.int(sleft.width * resizeConstant));
+		sleft.updateHitbox();
+		add(sleft);
+
+		var sright:FlxSprite = new FlxSprite(916, 300);
+		sright.frames = Paths.getSparrowAtlas('S Unown');
+		sright.animation.addByPrefix('static', 'S Unown', 24, true);
+		sright.animation.play('static');
+		// sright.setGraphicSize(Std.int(sright.width * resizeConstant));
+		sright.updateHitbox();
+		add(sright);
+
+		var uUnown:FlxSprite = new FlxSprite(850, 50);
+		uUnown.frames = Paths.getSparrowAtlas('U unown');
+		uUnown.animation.addByPrefix('static', 'U Unown', 24, true);
+		uUnown.animation.play('static');
+		// uUnown.setGraphicSize(Std.int(uUnown.width * resizeConstant));
+		uUnown.updateHitbox();
+		add(uUnown);
 
 		grpOptions = new FlxTypedGroup<Alphabet>();
 		add(grpOptions);
