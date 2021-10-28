@@ -689,11 +689,16 @@ class PlayState extends MusicBeatState
 			}
 		} else {
 			// IM DEAD
-
-			// okay now fade in
-			dad.playAnim('fadeIn', true);
 			showCountdown = false;
-			startCountdown();
+			
+			FlxG.sound.play(Paths.sound('ImDead' + FlxG.random.int(1, 7), 'shared'), 1);
+			// okay now fade in
+			//dad.playAnim('fadeIn', true);
+			new FlxTimer().start(2, function(tmr:FlxTimer)
+			{
+				
+				startCountdown();
+			});
 		}
 
 		RecalculateRating();
@@ -1018,7 +1023,7 @@ class PlayState extends MusicBeatState
 				setOnLuas('defaultOpponentStrumY' + i, opponentStrums.members[i].y);
 				if(ClientPrefs.middleScroll) opponentStrums.members[i].visible = false;
 			}
-
+			dad.animation.play('fadeIn', true);
 			startedCountdown = true;
 			Conductor.songPosition = 0;
 			Conductor.songPosition -= Conductor.crochet * 5;
