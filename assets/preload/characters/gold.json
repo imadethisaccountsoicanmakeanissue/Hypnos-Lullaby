@@ -1,70 +1,87 @@
 {
 	"animations": [
 		{
+			"loop": true,
 			"offsets": [
 				0,
 				0
 			],
-			"loop": true,
-			"fps": 24,
 			"anim": "idle",
-			"indices": [],
-			"name": "Silver Idle"
+			"fps": 24,
+			"name": "Silver Idle",
+			"indices": []
 		},
 		{
+			"loop": false,
 			"offsets": [
 				11,
 				-348
 			],
-			"loop": false,
-			"fps": 24,
 			"anim": "singDOWN",
-			"indices": [],
-			"name": "Silver Down Full"
+			"fps": 24,
+			"name": "Silver Down Full",
+			"indices": []
 		},
 		{
+			"loop": false,
 			"offsets": [
 				-3,
 				181
 			],
-			"loop": false,
-			"fps": 24,
 			"anim": "singUP",
-			"indices": [],
-			"name": "Full Silver Up"
+			"fps": 24,
+			"name": "Full Silver Up",
+			"indices": []
 		},
 		{
+			"loop": false,
 			"offsets": [
 				619,
 				126
 			],
-			"loop": false,
-			"fps": 24,
 			"anim": "singLEFT",
-			"indices": [],
-			"name": "Lost Silver Left finished"
+			"fps": 24,
+			"name": "Lost Silver Left finished",
+			"indices": []
 		},
 		{
+			"loop": false,
 			"offsets": [
 				-96,
 				91
 			],
-			"loop": false,
-			"fps": 24,
 			"anim": "singRIGHT",
-			"indices": [],
-			"name": "Silver Right Finished"
+			"fps": 24,
+			"name": "Silver Right Finished",
+			"indices": []
 		},
 		{
-			"loop": false,
 			"offsets": [
 				0,
 				0
 			],
-			"anim": "fadeIn",
+			"indices": [
+				0,
+				1,
+				2,
+				3,
+				4,
+				5,
+				6,
+				7,
+				8,
+				9,
+				10,
+				11,
+				12,
+				13,
+				14,
+				15
+			],
 			"fps": 24,
-			"name": "Silver Spawn Full",
-			"indices": []
+			"anim": "fadeIn",
+			"loop": false,
+			"name": "Silver Spawn Full"
 		}
 	],
 	"no_antialiasing": false,

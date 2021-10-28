@@ -92,6 +92,8 @@ class PlayState extends MusicBeatState
 	public var GF_X:Float = 400;
 	public var GF_Y:Float = 130;
 
+	public var canHitPendulum:Bool = false;
+	public var hitPendulum:Bool = false;
 	public var boyfriendGroup:FlxSpriteGroup;
 	public var dadGroup:FlxSpriteGroup;
 	public var gfGroup:FlxSpriteGroup;
@@ -156,6 +158,7 @@ class PlayState extends MusicBeatState
 	public var iconP1:HealthIcon;
 	public var iconP2:HealthIcon;
 	public var camHUD:FlxCamera;
+	var trance:Float = 0;
 	public var camGame:FlxCamera;
 	public var camOther:FlxCamera;
 	public var cameraSpeed:Float = 1;
@@ -229,7 +232,12 @@ class PlayState extends MusicBeatState
 	public var introSoundsSuffix:String = '';
 
 	var pendulum:Pendulum;
+	var tranceThing:FlxSprite;
 
+	var tranceActive:Bool = false;
+	var tranceSound:FlxSound;
+	var psyshockCooldown:Int = 10;
+	var psyshocking:Bool = false;
 	override public function create()
 	{
 		#if MODS_ALLOWED
@@ -292,7 +300,7 @@ class PlayState extends MusicBeatState
 		if(PlayState.SONG.stage == null || PlayState.SONG.stage.length < 1) {
 			switch (songName)
 			{
-				case 'left-unchecked' | 'safety-lullaby':
+				case 'left-unchecked' | 'safety-lullaby' | 'sporting':
 					curStage = 'alley';
 				case 'monochrome':
 					curStage = 'lost';
@@ -693,16 +701,56 @@ class PlayState extends MusicBeatState
 		super.create();
 
 		pendulum = new Pendulum();
-		pendulum.frames = Paths.getSparrowAtlas('hypno/Pendelum', 'shared');
-		pendulum.animation.addByPrefix('idle', 'Pendelum instance 1', 24, true);
-		pendulum.animation.play('idle');
 		
-		pendulum.scale.set(1.3, 1.3);
-		pendulum.updateHitbox();
-		pendulum.origin.set(65, 0);
-		pendulum.angle = -9;
-		if (SONG.player2 == 'hypno')
+		if (SONG.player2 == 'hypno') {
+			pendulum.frames = Paths.getSparrowAtlas('hypno/Pendelum', 'shared');
+			pendulum.animation.addByPrefix('idle', 'Pendelum instance 1', 24, true);
+			pendulum.animation.play('idle');
+			
+			pendulum.scale.set(1.3, 1.3);
+			pendulum.updateHitbox();
+			pendulum.origin.set(65, 0);
+			pendulum.angle = -9;
 			add(pendulum);
+
+			tranceActive = true;
+		} else if (SONG.player2 == 'hypno-two') {
+			pendulum.frames = Paths.getSparrowAtlas('hypno/Pendelum_Phase2', 'shared');
+			pendulum.animation.addByPrefix('idle', 'Pendelum Phase 2', 24, true);
+			pendulum.animation.play('idle');
+			pendulum.updateHitbox();
+			pendulum.origin.set(65, 0);
+			pendulum.cameras = [camHUD];
+			pendulum.x = FlxG.width / 4;
+			pendulum.y = 0;
+			add(pendulum);
+
+			tranceActive = true;
+		}
+
+		tranceThing = new FlxSprite();
+		tranceThing.frames = Paths.getSparrowAtlas('hypno/StaticHypno', 'shared');
+		tranceThing.animation.addByPrefix('idle', 'StaticHypno', 24, true);
+		tranceThing.animation.play('idle');
+		tranceThing.cameras = [camHUD];
+		tranceThing.setGraphicSize(FlxG.width, FlxG.height);
+		tranceThing.updateHitbox();
+		add(tranceThing);
+		tranceThing.alpha = 0;
+
+		tranceSound = FlxG.sound.play(Paths.sound('TranceStatic', 'shared'), 0, true);
+
+		if (SONG.song.toLowerCase() == 'monochrome') {
+			healthBar.alpha = 0;
+			healthBarBG.alpha = 0;
+			iconP1.alpha = 0;
+			iconP2.alpha = 0;
+			scoreTxt.alpha = 0;
+			timeBar.alpha = 0;
+			timeBarBG.alpha = 0;
+			timeTxt.alpha = 0;
+			dad.visible = false;
+		}
 	}
 
 	public function addTextToDebug(text:String) {
@@ -944,8 +992,14 @@ class PlayState extends MusicBeatState
 		inCutscene = false;
 		var ret:Dynamic = callOnLuas('onStartCountdown', []);
 		if(ret != FunkinLua.Function_Stop) {
-			generateStaticArrows(0);
-			generateStaticArrows(1);
+			var enemyAlpha:Float = 1;
+			var playerAlpha:Float = 1;
+			if (SONG.song.toLowerCase() == 'monochrome') {
+				enemyAlpha = 0;
+				playerAlpha = 0;
+			}
+			generateStaticArrows(0, enemyAlpha);
+			generateStaticArrows(1, playerAlpha);
 			for (i in 0...playerStrums.length) {
 				setOnLuas('defaultPlayerStrumX' + i, playerStrums.members[i].x);
 				setOnLuas('defaultPlayerStrumY' + i, playerStrums.members[i].y);
@@ -970,12 +1024,12 @@ class PlayState extends MusicBeatState
 					{
 						boyfriend.dance();
 					}
-					if (dad.animation.curAnim != null && !dad.animation.curAnim.name.startsWith('sing') && !dad.stunned)
+					if (dad.animation.curAnim != null && !dad.animation.curAnim.name.startsWith('sing') && !dad.stunned && !psyshocking)
 					{
 						dad.dance();
 					}
 				}
-				else if(dad.danceIdle && dad.animation.curAnim != null && !dad.stunned && !dad.curCharacter.startsWith('gf') && !dad.animation.curAnim.name.startsWith("sing"))
+				else if(dad.danceIdle && dad.animation.curAnim != null && !dad.stunned && !dad.curCharacter.startsWith('gf') && !dad.animation.curAnim.name.startsWith("sing") && !psyshocking)
 				{
 					dad.dance();
 				}
@@ -1106,10 +1160,10 @@ class PlayState extends MusicBeatState
 	var songTime:Float = 0;
 
 	function pendulumSwing() {
-		pendulum.daTween = FlxTween.tween(pendulum, {angle: 21}, Conductor.stepCrochet * 4 / 1000, {ease: FlxEase.quadOut, onComplete: function (twn:FlxTween) {
-			pendulum.daTween = FlxTween.tween(pendulum, {angle: -9}, Conductor.stepCrochet * 4 / 1000, {ease: FlxEase.quadIn, onComplete: function (twn:FlxTween) {
-				pendulum.daTween = FlxTween.tween(pendulum, {angle: -39}, Conductor.stepCrochet * 4 / 1000, {ease: FlxEase.quadOut, onComplete: function (twn:FlxTween) {
-					pendulum.daTween = FlxTween.tween(pendulum, {angle: -9}, Conductor.stepCrochet * 4 / 1000, {ease: FlxEase.quadIn, onComplete: function (twn:FlxTween) {
+		pendulum.daTween = FlxTween.tween(pendulum, {angle: pendulum.angle + 30}, Conductor.stepCrochet * 4 / 1000, {ease: FlxEase.quadOut, onComplete: function (twn:FlxTween) {
+			pendulum.daTween = FlxTween.tween(pendulum, {angle: pendulum.angle - 30}, Conductor.stepCrochet * 4 / 1000, {ease: FlxEase.quadIn, onComplete: function (twn:FlxTween) {
+				pendulum.daTween = FlxTween.tween(pendulum, {angle: pendulum.angle - 30}, Conductor.stepCrochet * 4 / 1000, {ease: FlxEase.quadOut, onComplete: function (twn:FlxTween) {
+					pendulum.daTween = FlxTween.tween(pendulum, {angle: pendulum.angle + 30}, Conductor.stepCrochet * 4 / 1000, {ease: FlxEase.quadIn, onComplete: function (twn:FlxTween) {
 						pendulumSwing();
 					}});
 				}});
@@ -1127,18 +1181,31 @@ class PlayState extends MusicBeatState
 		FlxG.sound.music.onComplete = finishSong;
 		vocals.play();
 
+		if (SONG.song.toLowerCase() == 'monochrome') {
+			dad.animation.play('fadeIn', true);
+			dad.visible = true;
+			
+			//healthBar.alpha = 0.4;
+			//healthBarBG.alpha = 0.4;
+			//iconP1.alpha = 0;
+			//iconP2.alpha = 0.4;
+			//scoreTxt.alpha = 0.4;
+		}
+		
 		if(paused) {
 			//trace('Oopsie doopsie! Paused sound');
 			FlxG.sound.music.pause();
 			vocals.pause();
+			tranceSound.pause();
 		} else
 			pendulumSwing();
 		
 		// Song duration in a float, useful for the time left feature
 		songLength = FlxG.sound.music.length;
-		FlxTween.tween(timeBar, {alpha: 1}, 0.5, {ease: FlxEase.circOut});
-		FlxTween.tween(timeTxt, {alpha: 1}, 0.5, {ease: FlxEase.circOut});
-
+		if (SONG.song.toLowerCase() != 'monochrome') {
+			FlxTween.tween(timeBar, {alpha: 1}, 0.5, {ease: FlxEase.circOut});
+			FlxTween.tween(timeTxt, {alpha: 1}, 0.5, {ease: FlxEase.circOut});
+		}
 		#if desktop
 		// Updating Discord Rich Presence (with Time Left)
 		DiscordClient.changePresence(detailsText, SONG.song + " (" + storyDifficultyText + ")", iconP2.getCharacter(), true, songLength);
@@ -1328,7 +1395,7 @@ class PlayState extends MusicBeatState
 		return FlxSort.byValues(FlxSort.ASCENDING, Obj1[0] - earlyTime1, Obj2[0] - earlyTime2);
 	}
 
-	private function generateStaticArrows(player:Int):Void
+	private function generateStaticArrows(player:Int, theAlpha:Float):Void
 	{
 		for (i in 0...4)
 		{
@@ -1338,7 +1405,9 @@ class PlayState extends MusicBeatState
 			{
 				babyArrow.y -= 10;
 				babyArrow.alpha = 0;
-				FlxTween.tween(babyArrow, {y: babyArrow.y + 10, alpha: 1}, 1, {ease: FlxEase.circOut, startDelay: 0.5 + (0.2 * i)});
+				FlxTween.tween(babyArrow, {y: babyArrow.y + 10, alpha: theAlpha}, 1, {ease: FlxEase.circOut, startDelay: 0.5 + (0.2 * i)});
+			} else {
+				babyArrow.alpha = theAlpha;
 			}
 
 			if (player == 1)
@@ -1364,7 +1433,9 @@ class PlayState extends MusicBeatState
 			{
 				FlxG.sound.music.pause();
 				vocals.pause();
+				tranceSound.pause();
 			}
+			
 
 			if (!startTimer.finished)
 				startTimer.active = false;
@@ -1475,6 +1546,7 @@ class PlayState extends MusicBeatState
 		Conductor.songPosition = FlxG.sound.music.time;
 		vocals.time = Conductor.songPosition;
 		vocals.play();
+		tranceSound.play();
 	}
 
 	private var paused:Bool = false;
@@ -1583,7 +1655,7 @@ class PlayState extends MusicBeatState
 				iconP2.animation.curAnim.curFrame = 0;
 		}
 
-
+		
 		if (FlxG.keys.justPressed.EIGHT && !endingSong && !inCutscene) {
 			persistentUpdate = false;
 			paused = true;
@@ -1651,137 +1723,186 @@ class PlayState extends MusicBeatState
 		}
 		doDeathCheck();
 
-		var pendulumOffset:Array<Int> = [];
-		switch (dad.animation.name) {
-			case 'idle':
-				switch (dad.animation.curAnim.curFrame) {
-					case 0 | 1:
-						pendulumOffset[0] = 814;
-						pendulumOffset[1] = 264;
-					case 2 | 3:
-						pendulumOffset[0] = 813;
-						pendulumOffset[1] = 270;
-					case 4:
-						pendulumOffset[0] = 813;
-						pendulumOffset[1] = 266;
-					case 5:
-						pendulumOffset[0] = 813;
-						pendulumOffset[1] = 263;
-					case 6:
-						pendulumOffset[0] = 814;
-						pendulumOffset[1] = 255;
-					case 7:
-						pendulumOffset[0] = 811;
-						pendulumOffset[1] = 251;
-					case 8 | 9:
-						pendulumOffset[0] = 809;
-						pendulumOffset[1] = 249;
-					case 10 | 11 | 12 | 13 | 14:
-						pendulumOffset[0] = 808;
-						pendulumOffset[1] = 248;
-				}
-			case 'singLEFT':
-				switch (dad.animation.curAnim.curFrame) {
-					case 0:
-						pendulumOffset[0] = 775;
-						pendulumOffset[1] = 336;
-					case 1:
-						pendulumOffset[0] = 790;
-						pendulumOffset[1] = 351;
-					case 2:
-						pendulumOffset[0] = 826;
-						pendulumOffset[1] = 366;
-					case 3 | 4:
-						pendulumOffset[0] = 830;
-						pendulumOffset[1] = 378;
-					case 5 | 6:
-						pendulumOffset[0] = 831;
-						pendulumOffset[1] = 393;
-					case 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17:
-						pendulumOffset[0] = 832;
-						pendulumOffset[1] = 396;
-				}
-			case 'singRIGHT':
-				switch (dad.animation.curAnim.curFrame) {
-					case 0 | 1 | 2:
-						pendulumOffset[0] = 866;
-						pendulumOffset[1] = 609;
-					case 3:
-						pendulumOffset[0] = 858;
-						pendulumOffset[1] = 612;
-					case 4:
-						pendulumOffset[0] = 881;
-						pendulumOffset[1] = 610;
-					case 5:
-						pendulumOffset[0] = 901;
-						pendulumOffset[1] = 597;
-					case 6:
-						pendulumOffset[0] = 903;
-						pendulumOffset[1] = 590;
-					case 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17:
-						pendulumOffset[0] = 908;
-						pendulumOffset[1] = 586;
-				}
-			case 'singUP':
-				switch (dad.animation.curAnim.curFrame) {
-					case 0:
-						pendulumOffset[0] = 638;
-						pendulumOffset[1] = -300;
-					case 1:
-						pendulumOffset[0] = 675;
-						pendulumOffset[1] = -267;
-					case 2:
-						pendulumOffset[0] = 681;
-						pendulumOffset[1] = -257;
-					case 3:
-						pendulumOffset[0] = 694;
-						pendulumOffset[1] = -249;
-					case 4:
-						pendulumOffset[0] = 696;
-						pendulumOffset[1] = -241;
-					case 5:
-						pendulumOffset[0] = 705;
-						pendulumOffset[1] = -237;
-					case 6 | 7:
-						pendulumOffset[0] = 709;
-						pendulumOffset[1] = -236;
-					case 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17:
-						pendulumOffset[0] = 711;
-						pendulumOffset[1] = -234;
-				}
-			case 'singDOWN':
-				switch (dad.animation.curAnim.curFrame) {
-					case 0:
-						pendulumOffset[0] = 700;
-						pendulumOffset[1] = 222;
-					case 1:
-						pendulumOffset[0] = 705;
-						pendulumOffset[1] = 237;
-					case 2:
-						pendulumOffset[0] = 692;
-						pendulumOffset[1] = 220;
-					case 3 | 4:
-						pendulumOffset[0] = 687;
-						pendulumOffset[1] = 213;
-					case 5:
-						pendulumOffset[0] = 690;
-						pendulumOffset[1] = 220;
-					case 6:
-						pendulumOffset[0] = 689;
-						pendulumOffset[1] = 227;
-					case 7:
-						pendulumOffset[0] = 680;
-						pendulumOffset[1] = 242;
-					case 8:
-						pendulumOffset[0] = 679;
-						pendulumOffset[1] = 243;
-					case 9 | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17:
-						pendulumOffset[0] = 673;
-						pendulumOffset[1] = 253;
-				}
+		if (FlxG.keys.justPressed.SPACE) {
+			if (canHitPendulum) {
+				canHitPendulum = false;
+				hitPendulum = true;
+			} else {
+				losePendulum();
+			}
 		}
-		pendulum.x = dad.x + pendulumOffset[0];
-		pendulum.y = dad.y + pendulumOffset[1];
+		
+		if (tranceActive) {
+			tranceThing.alpha = trance / 2;
+			if (trance > 1) {
+				tranceSound.volume = trance - 1;
+			} else {
+				tranceSound.volume = 0;
+			}
+			
+			if (trance > 2) {
+				trance = 2;
+				die();
+			}
+		}
+
+		var pendulumOffset:Array<Int> = [];
+		if (dad.curCharacter == 'hypno') {
+			switch (dad.animation.name) {
+				case 'idle':
+					switch (dad.animation.curAnim.curFrame) {
+						case 0 | 1:
+							pendulumOffset[0] = 814;
+							pendulumOffset[1] = 264;
+						case 2 | 3:
+							pendulumOffset[0] = 813;
+							pendulumOffset[1] = 270;
+						case 4:
+							pendulumOffset[0] = 813;
+							pendulumOffset[1] = 266;
+						case 5:
+							pendulumOffset[0] = 813;
+							pendulumOffset[1] = 263;
+						case 6:
+							pendulumOffset[0] = 814;
+							pendulumOffset[1] = 255;
+						case 7:
+							pendulumOffset[0] = 811;
+							pendulumOffset[1] = 251;
+						case 8 | 9:
+							pendulumOffset[0] = 809;
+							pendulumOffset[1] = 249;
+						case 10 | 11 | 12 | 13 | 14:
+							pendulumOffset[0] = 808;
+							pendulumOffset[1] = 248;
+					}
+				case 'singLEFT':
+					switch (dad.animation.curAnim.curFrame) {
+						case 0:
+							pendulumOffset[0] = 775;
+							pendulumOffset[1] = 336;
+						case 1:
+							pendulumOffset[0] = 790;
+							pendulumOffset[1] = 351;
+						case 2:
+							pendulumOffset[0] = 826;
+							pendulumOffset[1] = 366;
+						case 3 | 4:
+							pendulumOffset[0] = 830;
+							pendulumOffset[1] = 378;
+						case 5 | 6:
+							pendulumOffset[0] = 831;
+							pendulumOffset[1] = 393;
+						case 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17:
+							pendulumOffset[0] = 832;
+							pendulumOffset[1] = 396;
+					}
+				case 'singRIGHT':
+					switch (dad.animation.curAnim.curFrame) {
+						case 0 | 1 | 2:
+							pendulumOffset[0] = 866;
+							pendulumOffset[1] = 609;
+						case 3:
+							pendulumOffset[0] = 858;
+							pendulumOffset[1] = 612;
+						case 4:
+							pendulumOffset[0] = 881;
+							pendulumOffset[1] = 610;
+						case 5:
+							pendulumOffset[0] = 901;
+							pendulumOffset[1] = 597;
+						case 6:
+							pendulumOffset[0] = 903;
+							pendulumOffset[1] = 590;
+						case 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17:
+							pendulumOffset[0] = 908;
+							pendulumOffset[1] = 586;
+					}
+				case 'singUP':
+					switch (dad.animation.curAnim.curFrame) {
+						case 0:
+							pendulumOffset[0] = 638;
+							pendulumOffset[1] = -300;
+						case 1:
+							pendulumOffset[0] = 675;
+							pendulumOffset[1] = -267;
+						case 2:
+							pendulumOffset[0] = 681;
+							pendulumOffset[1] = -257;
+						case 3:
+							pendulumOffset[0] = 694;
+							pendulumOffset[1] = -249;
+						case 4:
+							pendulumOffset[0] = 696;
+							pendulumOffset[1] = -241;
+						case 5:
+							pendulumOffset[0] = 705;
+							pendulumOffset[1] = -237;
+						case 6 | 7:
+							pendulumOffset[0] = 709;
+							pendulumOffset[1] = -236;
+						case 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17:
+							pendulumOffset[0] = 711;
+							pendulumOffset[1] = -234;
+					}
+				case 'singDOWN':
+					switch (dad.animation.curAnim.curFrame) {
+						case 0:
+							pendulumOffset[0] = 700;
+							pendulumOffset[1] = 222;
+						case 1:
+							pendulumOffset[0] = 705;
+							pendulumOffset[1] = 237;
+						case 2:
+							pendulumOffset[0] = 692;
+							pendulumOffset[1] = 220;
+						case 3 | 4:
+							pendulumOffset[0] = 687;
+							pendulumOffset[1] = 213;
+						case 5:
+							pendulumOffset[0] = 690;
+							pendulumOffset[1] = 220;
+						case 6:
+							pendulumOffset[0] = 689;
+							pendulumOffset[1] = 227;
+						case 7:
+							pendulumOffset[0] = 680;
+							pendulumOffset[1] = 242;
+						case 8:
+							pendulumOffset[0] = 679;
+							pendulumOffset[1] = 243;
+						case 9 | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17:
+							pendulumOffset[0] = 673;
+							pendulumOffset[1] = 253;
+					}
+				case 'psyshock':
+					switch (dad.animation.curAnim.curFrame) {
+						case 0:
+							pendulumOffset[0] = 737;
+							pendulumOffset[1] = 386;
+						case 1:
+							pendulumOffset[0] = 713;
+							pendulumOffset[1] = 396;
+						case 2:
+							pendulumOffset[0] = 706;
+							pendulumOffset[1] = 394;
+						case 3 :
+							pendulumOffset[0] = 708;
+							pendulumOffset[1] = 392;
+						case 4 | 5:
+							pendulumOffset[0] = 709;
+							pendulumOffset[1] = 391;
+						case 6:
+							pendulumOffset[0] = 709;
+							pendulumOffset[1] = 405;
+						case 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17:
+							pendulumOffset[0] = 703;
+							pendulumOffset[1] = 416;
+					}
+			}
+			pendulum.x = dad.x + pendulumOffset[0];
+			pendulum.y = dad.y + pendulumOffset[1];
+		} else pendulum.screenCenter(X);
 
 		var roundedSpeed:Float = FlxMath.roundDecimal(SONG.speed, 2);
 		if (unspawnNotes[0] != null)
@@ -1932,8 +2053,8 @@ class PlayState extends MusicBeatState
 							case 3:
 								animToPlay = 'singRIGHT';
 						}
-
-						dad.playAnim(animToPlay + altAnim, true);
+						if (!psyshocking)
+							dad.playAnim(animToPlay + altAnim, true);
 						dad.holdTimer = 0;
 					}
 
@@ -2049,38 +2170,43 @@ class PlayState extends MusicBeatState
 	}
 
 	var isDead:Bool = false;
+
+	function die() {
+		var ret:Dynamic = callOnLuas('onGameOver', []);
+		if(ret != FunkinLua.Function_Stop) {
+			boyfriend.stunned = true;
+			deathCounter++;
+
+			persistentUpdate = false;
+			persistentDraw = false;
+			paused = true;
+
+			vocals.stop();
+			FlxG.sound.music.stop();
+
+			openSubState(new GameOverSubstate(boyfriend.getScreenPosition().x, boyfriend.getScreenPosition().y, camFollowPos.x, camFollowPos.y, this));
+			for (tween in modchartTweens) {
+				tween.active = true;
+			}
+			for (timer in modchartTimers) {
+				timer.active = true;
+			}
+
+			// MusicBeatState.switchState(new GameOverState(boyfriend.getScreenPosition().x, boyfriend.getScreenPosition().y));
+			
+			#if desktop
+			// Game Over doesn't get his own variable because it's only used here
+			DiscordClient.changePresence("Game Over - " + detailsText, SONG.song + " (" + storyDifficultyText + ")", iconP2.getCharacter());
+			#end
+			isDead = true;
+			
+		}
+	}
 	function doDeathCheck() {
 		if (health <= 0 && !practiceMode && !isDead)
 		{
-			var ret:Dynamic = callOnLuas('onGameOver', []);
-			if(ret != FunkinLua.Function_Stop) {
-				boyfriend.stunned = true;
-				deathCounter++;
-
-				persistentUpdate = false;
-				persistentDraw = false;
-				paused = true;
-
-				vocals.stop();
-				FlxG.sound.music.stop();
-
-				openSubState(new GameOverSubstate(boyfriend.getScreenPosition().x, boyfriend.getScreenPosition().y, camFollowPos.x, camFollowPos.y, this));
-				for (tween in modchartTweens) {
-					tween.active = true;
-				}
-				for (timer in modchartTimers) {
-					timer.active = true;
-				}
-
-				// MusicBeatState.switchState(new GameOverState(boyfriend.getScreenPosition().x, boyfriend.getScreenPosition().y));
-				
-				#if desktop
-				// Game Over doesn't get his own variable because it's only used here
-				DiscordClient.changePresence("Game Over - " + detailsText, SONG.song + " (" + storyDifficultyText + ")", iconP2.getCharacter());
-				#end
-				isDead = true;
-				return true;
-			}
+			die();
+			return true;
 		}
 		return false;
 	}
@@ -2256,6 +2382,8 @@ class PlayState extends MusicBeatState
 			
 			case 'BG Freaks Expression':
 				if(bgGirls != null) bgGirls.swapDanceType();
+			case 'Psyshock':
+				psyshock();
 		}
 		callOnLuas('onEvent', [eventName, value1, value2]);
 	}
@@ -2339,6 +2467,7 @@ class PlayState extends MusicBeatState
 		FlxG.sound.music.volume = 0;
 		vocals.volume = 0;
 		vocals.pause();
+		tranceSound.pause();
 		if(ClientPrefs.noteOffset <= 0) {
 			finishCallback();
 		} else {
@@ -2347,7 +2476,6 @@ class PlayState extends MusicBeatState
 			});
 		}
 	}
-
 
 	var transitioning = false;
 	public function endSong():Void
@@ -3089,9 +3217,73 @@ class PlayState extends MusicBeatState
 	}
 
 	var lastStepHit:Int = -1;
+	function winPendulum() {
+		trance -= 0.08;
+		if (trance < 0)
+			trance = 0;
+		trace('GOOD');
+	}
+
+	function losePendulum() {
+		trance += 0.1;
+		trace("BAD");
+	}
+
+	function psyshock() {
+		
+		var psyshockParticle = new Character(0, 0, 'hypno');
+		psyshockParticle.setPosition(dad.x, dad.y);
+		add(psyshockParticle);
+		psyshockParticle.playAnim("psyshock particle", true);
+		psyshockParticle.animation.finishCallback = function (lol:String) {
+			remove(psyshockParticle);
+		};
+		
+		
+		trance += 0.45;
+		
+		FlxG.sound.play(Paths.sound('Psyshock', 'shared'), 1);
+		camHUD.flash(FlxColor.fromString('0xFFFFAFC1'), 1, null, true);
+	}
 	override function stepHit()
 	{
 		super.stepHit();
+		if (tranceActive) {
+			if (psyshockCooldown <= 0) {
+				
+				psyshock();
+
+				if (dad.curCharacter == 'hypno') {
+					dad.playAnim('psyshock', true);
+					psyshocking = true;
+					new FlxTimer().start(Conductor.stepCrochet * 4 / 1000, function(tmr:FlxTimer)
+					{
+						psyshocking = false;
+					});
+					psyshockCooldown = FlxG.random.int(70, 150);
+				} else 
+					psyshockCooldown = FlxG.random.int(60, 90);
+			} else {
+				psyshockCooldown--;
+			}
+		}
+		switch (curStep % 16) {
+			case 7 | 15:
+				canHitPendulum = true;
+				//pendulum.color = FlxColor.GREEN;
+			case 10 | 2:
+				canHitPendulum = false;
+				if (!hitPendulum) {
+					losePendulum();
+				} else {
+					
+					hitPendulum = false;
+					
+					winPendulum();
+				}
+				
+				//pendulum.color = FlxColor.RED;
+		}
 		if (FlxG.sound.music.time > Conductor.songPosition + 20 || FlxG.sound.music.time < Conductor.songPosition - 20)
 		{
 			resyncVocals();
@@ -3110,16 +3302,43 @@ class PlayState extends MusicBeatState
 	var lightningOffset:Int = 8;
 
 	var lastBeatHit:Int = -1;
+	function resetPendulum() {
+		pendulum.daTween.cancel();
+		
+		if (SONG.player2 == 'hypno')
+			pendulum.angle = -9;
+		else
+			pendulum.angle = 0;
+		pendulumSwing();
+	}
 	override function beatHit()
 	{
 		super.beatHit();
 
-		if (SONG.player2 == 'hypno') {
+		if (tranceActive) {
 			if (!pendulum.daTween.active) {
-				pendulum.angle = -9;
+				if (SONG.player2 == 'hypno')
+					pendulum.angle = -9;
+				else
+					pendulum.angle = 0;
 				pendulumSwing();
-
 			}
+		}
+		if (curBeat % 8 == 0)
+			resetPendulum(); 
+		switch (SONG.song.toLowerCase()) {
+			case 'monochrome':
+				switch (curBeat) {
+					case 28:
+						FlxTween.tween(healthBar, {alpha: 0.4}, 3, {ease: FlxEase.linear});
+						FlxTween.tween(healthBarBG, {alpha: 0.4}, 3, {ease: FlxEase.linear});
+						FlxTween.tween(scoreTxt, {alpha: 0.4}, 3, {ease: FlxEase.linear});
+						FlxTween.tween(iconP1, {alpha: 1}, 3, {ease: FlxEase.linear});
+						FlxTween.tween(iconP2, {alpha: 1}, 3, {ease: FlxEase.linear});
+						for (i in playerStrums) {
+							FlxTween.tween(i, {alpha: 0.7}, 3, {ease: FlxEase.linear});
+						}
+				}
 		}
 		if(lastBeatHit >= curBeat) {
 			trace('BEAT HIT: ' + curBeat + ', LAST HIT: ' + lastBeatHit);
@@ -3168,11 +3387,11 @@ class PlayState extends MusicBeatState
 			{
 				boyfriend.dance();
 			}
-			if (dad.animation.curAnim.name != null && !dad.animation.curAnim.name.startsWith("sing") && !dad.stunned)
+			if (dad.animation.curAnim.name != null && !dad.animation.curAnim.name.startsWith("sing") && !dad.stunned && !psyshocking)
 			{
 				dad.dance();
 			}
-		} else if(dad.danceIdle && dad.animation.curAnim.name != null && !dad.curCharacter.startsWith('gf') && !dad.animation.curAnim.name.startsWith("sing") && !dad.stunned) {
+		} else if(dad.danceIdle && dad.animation.curAnim.name != null && !dad.curCharacter.startsWith('gf') && !dad.animation.curAnim.name.startsWith("sing") && !dad.stunned && !psyshocking) {
 			dad.dance();
 		}
 
