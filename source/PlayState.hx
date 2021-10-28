@@ -367,15 +367,23 @@ class PlayState extends MusicBeatState
 				var consistentPosition:Array<Float> = [-300, -600];
 				var resizeBG:Float = 0.7;
 				
-				var background:BGSprite = new BGSprite('missingno/bg', consistentPosition[0], consistentPosition[1]);
+				var background:BGSprite = new BGSprite(null, consistentPosition[0], consistentPosition[1]);
+				background.loadGraphic(PreloadState.preloadedAssets['hypno/Hypno bg background']);
+
 				background.setGraphicSize(Std.int(background.width * resizeBG));
 				background.updateHitbox();
 				add(background);
-				var midGround:BGSprite = new BGSprite('hypno/Hypno bg midground', consistentPosition[0], consistentPosition[1]);
+
+				var midGround:BGSprite = new BGSprite(null, consistentPosition[0], consistentPosition[1]);
+				midGround.loadGraphic(PreloadState.preloadedAssets['hypno/Hypno bg midground']);
+
 				midGround.setGraphicSize(Std.int(midGround.width * resizeBG));
 				midGround.updateHitbox();
 				add(midGround);
-				foreground = new BGSprite('hypno/Hypno bg foreground', consistentPosition[0], consistentPosition[1]);
+
+				foreground = new BGSprite(null, consistentPosition[0], consistentPosition[1]);
+				foreground.loadGraphic(PreloadState.preloadedAssets['hypno/Hypno bg foreground']);
+				
 				foreground.setGraphicSize(Std.int(foreground.width * resizeBG));
 				foreground.updateHitbox();
 			case 'missingno':
@@ -2695,6 +2703,9 @@ class PlayState extends MusicBeatState
 			score = -50;
 			healthMultiplier = -1;
 			songMisses++;
+
+			combo = 0;
+			popUpScore(note);
 		}
 		else if (noteDiff > 100)
 		{
@@ -2823,8 +2834,7 @@ class PlayState extends MusicBeatState
 			numScore.velocity.x = FlxG.random.float(-5, 5);
 			numScore.visible = !ClientPrefs.hideHud;
 
-			if (combo >= 10 || combo == 0)
-				add(numScore);
+			add(numScore);
 
 			FlxTween.tween(numScore, {alpha: 0}, 0.2, {
 				onComplete: function(tween:FlxTween)
@@ -2998,6 +3008,7 @@ class PlayState extends MusicBeatState
 		health -= daNote.missHealth; //For testing purposes
 		//trace(daNote.missHealth);
 		songMisses++;
+		combo = 0;
 		vocals.volume = 0;
 		RecalculateRating();
 
@@ -3098,8 +3109,8 @@ class PlayState extends MusicBeatState
 
 			if (!note.isSustainNote)
 			{
-				popUpScore(note);
 				combo += 1;
+				popUpScore(note);
 				if(combo > 9999) combo = 9999;
 			}
 
