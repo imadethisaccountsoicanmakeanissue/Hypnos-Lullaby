@@ -152,6 +152,8 @@ class PlayState extends MusicBeatState
 	public static var changedDifficulty:Bool = false;
 	public static var cpuControlled:Bool = false;
 
+	
+
 	var botplaySine:Float = 0;
 	var botplayTxt:FlxText;
 
@@ -189,7 +191,7 @@ class PlayState extends MusicBeatState
 	var bgGirls:BackgroundGirls;
 	var wiggleShit:WiggleEffect = new WiggleEffect();
 	var bgGhouls:BGSprite;
-
+	var psyshockParticle:Character;	
 	public var songScore:Int = 0;
 	public var songHits:Int = 0;
 	public var songMisses:Int = 0;
@@ -212,7 +214,7 @@ class PlayState extends MusicBeatState
 
 	public var inCutscene:Bool = false;
 	var songLength:Float = 0;
-
+	
 	#if desktop
 	// Discord RPC variables
 	var storyDifficultyText:String = "";
@@ -220,6 +222,7 @@ class PlayState extends MusicBeatState
 	var detailsPausedText:String = "";
 	#end
 
+	var isMonoDead:Bool = false;
 	private var luaArray:Array<FunkinLua> = [];
 
 	//Achievement shit
@@ -233,11 +236,18 @@ class PlayState extends MusicBeatState
 
 	var pendulum:Pendulum;
 	var tranceThing:FlxSprite;
+	var pendulumShadow:FlxTypedGroup<FlxSprite>;
 
 	var tranceActive:Bool = false;
 	var tranceSound:FlxSound;
-	var psyshockCooldown:Int = 10;
+	var psyshockCooldown:Int = 80;
 	var psyshocking:Bool = false;
+	var keyboardTimer:Int = 8;
+	var keyboard:FlxSprite;
+	var skippedFirstPendulum:Bool = false;
+
+	var unowning:Bool = false;
+
 	override public function create()
 	{
 		#if MODS_ALLOWED
@@ -717,6 +727,8 @@ class PlayState extends MusicBeatState
 		pendulum = new Pendulum();
 		
 		if (SONG.player2 == 'hypno') {
+			pendulumShadow = new FlxTypedGroup<FlxSprite>();
+			
 			pendulum.frames = Paths.getSparrowAtlas('hypno/Pendelum', 'shared');
 			pendulum.animation.addByPrefix('idle', 'Pendelum instance 1', 24, true);
 			pendulum.animation.play('idle');
@@ -725,10 +737,15 @@ class PlayState extends MusicBeatState
 			pendulum.updateHitbox();
 			pendulum.origin.set(65, 0);
 			pendulum.angle = -9;
+			add(pendulumShadow);
 			add(pendulum);
 
 			tranceActive = true;
+
+			
 		} else if (SONG.player2 == 'hypno-two') {
+			pendulumShadow = new FlxTypedGroup<FlxSprite>();
+
 			pendulum.frames = Paths.getSparrowAtlas('hypno/Pendelum_Phase2', 'shared');
 			pendulum.animation.addByPrefix('idle', 'Pendelum Phase 2', 24, true);
 			pendulum.animation.play('idle');
@@ -737,10 +754,21 @@ class PlayState extends MusicBeatState
 			pendulum.cameras = [camHUD];
 			pendulum.x = FlxG.width / 4;
 			pendulum.y = 0;
+			add(pendulumShadow);
 			add(pendulum);
 
 			tranceActive = true;
 		}
+		keyboard = new FlxSprite();
+		keyboard.frames = Paths.getSparrowAtlas('hypno/Extras', 'shared');
+		keyboard.animation.addByIndices('idle', 'Spacebar', [11, 12, 13, 14 ,15 ,16 ,17, 18], '', 24, false);
+		keyboard.animation.addByIndices('press', 'Spacebar', [1, 2, 3, 4, 5, 6, 7, 8, 9, 10], '', 24, false);
+		keyboard.animation.play('idle');
+		keyboard.cameras = [camHUD];
+		keyboard.screenCenter(X);
+		keyboard.y = 400;
+		keyboard.alpha = 0;
+		add(keyboard);
 
 		tranceThing = new FlxSprite();
 		tranceThing.frames = Paths.getSparrowAtlas('hypno/StaticHypno', 'shared');
@@ -752,6 +780,13 @@ class PlayState extends MusicBeatState
 		add(tranceThing);
 		tranceThing.alpha = 0;
 
+		psyshockParticle = new Character(0, 0, 'hypno');
+		psyshockParticle.playAnim("psyshock particle", true);
+		psyshockParticle.alpha = 0;
+		add(psyshockParticle);
+
+		camHUD.flash(FlxColor.fromString('0xFFFFAFC1'), 0.1, null, true);
+		FlxG.sound.play(Paths.sound('Psyshock', 'shared'), 0);
 		tranceSound = FlxG.sound.play(Paths.sound('TranceStatic', 'shared'), 0, true);
 
 		if (SONG.song.toLowerCase() == 'monochrome') {
@@ -1211,8 +1246,13 @@ class PlayState extends MusicBeatState
 			FlxG.sound.music.pause();
 			vocals.pause();
 			tranceSound.pause();
-		} else
-			pendulumSwing();
+		} else {
+			if (tranceActive) {
+				pendulumSwing();
+				FlxTween.tween(keyboard, {alpha: 1}, Conductor.stepCrochet * 2 / 1000, {ease: FlxEase.quadOut});
+			}
+
+		}
 		
 		// Song duration in a float, useful for the time left feature
 		songLength = FlxG.sound.music.length;
@@ -1552,6 +1592,10 @@ class PlayState extends MusicBeatState
 
 	function resyncVocals():Void
 	{
+		if (isMonoDead) {
+			Conductor.songPosition = 0;
+			return;
+		} 
 		if(finishTimer != null) return;
 
 		vocals.pause();
@@ -1569,6 +1613,22 @@ class PlayState extends MusicBeatState
 	var limoSpeed:Float = 0;
 	var camResize:Float = 0;
 
+	function startUnown(timer:Int = 15):Void {
+		canPause = false;
+		unowning = true;
+		persistentUpdate = true;
+		persistentDraw = true;
+		var unownState = new UnownSubState(timer);
+		unownState.win = wonUnown;
+		unownState.lose = die;
+		unownState.cameras = [camHUD];
+		
+		openSubState(unownState);
+	}
+	public function wonUnown():Void {
+		canPause = true;
+		unowning = false;
+	}
 	override public function update(elapsed:Float)
 	{
 		/*if (FlxG.keys.justPressed.NINE)
@@ -1605,6 +1665,9 @@ class PlayState extends MusicBeatState
 			botplayTxt.alpha = 1 - Math.sin((Math.PI * botplaySine) / 180);
 		}
 		botplayTxt.visible = cpuControlled;
+
+		if (FlxG.keys.justPressed.X)
+			startUnown();
 
 		if (FlxG.keys.justPressed.ENTER && startedCountdown && canPause)
 		{
@@ -1730,23 +1793,24 @@ class PlayState extends MusicBeatState
 		FlxG.watch.addQuick("stepShit", curStep);
 
 		// RESET = Quick Game Over Screen
-		if (controls.RESET && !inCutscene && !endingSong)
+		if (controls.RESET && !inCutscene && !endingSong && !unowning)
 		{
 			health = 0;
 			trace("RESET = True");
 		}
 		doDeathCheck();
 
-		if (FlxG.keys.justPressed.SPACE) {
-			if (canHitPendulum) {
-				canHitPendulum = false;
-				hitPendulum = true;
-			} else {
-				losePendulum();
-			}
-		}
 		
+		if (isMonoDead ) {
+			if (controls.ACCEPT)
+				MusicBeatState.resetState();
+			if (dad.animation.curAnim.curFrame == -30) {
+				var black:
+			}
+			//trace(dad.animation.curAnim.curFrame);
+		}
 		if (tranceActive) {
+			trance -= 0.0015;
 			tranceThing.alpha = trance / 2;
 			if (trance > 1) {
 				tranceSound.volume = trance - 1;
@@ -1757,6 +1821,18 @@ class PlayState extends MusicBeatState
 			if (trance > 2) {
 				trance = 2;
 				die();
+			}
+			if (trance < -0.1)
+				trance = -0.1;
+
+			if (FlxG.keys.justPressed.SPACE) {
+				if (canHitPendulum) {
+					canHitPendulum = false;
+					hitPendulum = true;
+					winPendulum();
+				} else {
+					losePendulum();
+				}
 			}
 		}
 
@@ -2135,7 +2211,7 @@ class PlayState extends MusicBeatState
 		
 		#if debug
 		if(!endingSong && !startingSong) {
-			if (FlxG.keys.justPressed.ONE) {
+			if (FlxG.keys.justPressed.ONE && !unowning) {
 				KillNotes();
 				FlxG.sound.music.onComplete();
 			}
@@ -2185,35 +2261,59 @@ class PlayState extends MusicBeatState
 
 	var isDead:Bool = false;
 
-	function die() {
-		var ret:Dynamic = callOnLuas('onGameOver', []);
-		if(ret != FunkinLua.Function_Stop) {
+	public function die():Void {
+		if (SONG.song.toLowerCase() == 'monochrome') {
 			boyfriend.stunned = true;
 			deathCounter++;
-
-			persistentUpdate = false;
-			persistentDraw = false;
 			paused = true;
 
 			vocals.stop();
 			FlxG.sound.music.stop();
 
-			openSubState(new GameOverSubstate(boyfriend.getScreenPosition().x, boyfriend.getScreenPosition().y, camFollowPos.x, camFollowPos.y, this));
-			for (tween in modchartTweens) {
-				tween.active = true;
-			}
-			for (timer in modchartTimers) {
-				timer.active = true;
-			}
-
-			// MusicBeatState.switchState(new GameOverState(boyfriend.getScreenPosition().x, boyfriend.getScreenPosition().y));
-			
-			#if desktop
-			// Game Over doesn't get his own variable because it's only used here
-			DiscordClient.changePresence("Game Over - " + detailsText, SONG.song + " (" + storyDifficultyText + ")", iconP2.getCharacter());
-			#end
 			isDead = true;
+			isMonoDead = true;
+
+			dad.playAnim('fadeIn', true, true);
 			
+			FlxTween.tween(healthBar, {alpha: 0}, 1, {ease: FlxEase.linear});
+			FlxTween.tween(healthBarBG, {alpha: 0}, 1, {ease: FlxEase.linear});
+			FlxTween.tween(scoreTxt, {alpha: 0}, 1, {ease: FlxEase.linear});
+			FlxTween.tween(iconP1, {alpha: 0}, 1, {ease: FlxEase.linear});
+			FlxTween.tween(iconP2, {alpha: 0}, 1, {ease: FlxEase.linear});
+			for (i in playerStrums) {
+				FlxTween.tween(i, {alpha: 0}, 1, {ease: FlxEase.linear});
+			}
+			
+		} else {
+			var ret:Dynamic = callOnLuas('onGameOver', []);
+			if(ret != FunkinLua.Function_Stop) {
+				boyfriend.stunned = true;
+				deathCounter++;
+
+				persistentUpdate = false;
+				persistentDraw = false;
+				paused = true;
+
+				vocals.stop();
+				FlxG.sound.music.stop();
+
+				openSubState(new GameOverSubstate(boyfriend.getScreenPosition().x, boyfriend.getScreenPosition().y, camFollowPos.x, camFollowPos.y, this));
+				for (tween in modchartTweens) {
+					tween.active = true;
+				}
+				for (timer in modchartTimers) {
+					timer.active = true;
+				}
+
+				// MusicBeatState.switchState(new GameOverState(boyfriend.getScreenPosition().x, boyfriend.getScreenPosition().y));
+				
+				#if desktop
+				// Game Over doesn't get his own variable because it's only used here
+				DiscordClient.changePresence("Game Over - " + detailsText, SONG.song + " (" + storyDifficultyText + ")", iconP2.getCharacter());
+				#end
+				isDead = true;
+				
+			}
 		}
 	}
 	function doDeathCheck() {
@@ -2398,6 +2498,8 @@ class PlayState extends MusicBeatState
 				if(bgGirls != null) bgGirls.swapDanceType();
 			case 'Psyshock':
 				psyshock();
+			case 'Unown':
+				startUnown(Std.parseInt(value1));
 		}
 		callOnLuas('onEvent', [eventName, value1, value2]);
 	}
@@ -3226,9 +3328,19 @@ class PlayState extends MusicBeatState
 
 	var lastStepHit:Int = -1;
 	function winPendulum() {
-		trance -= 0.08;
-		if (trance < 0)
-			trance = 0;
+		trance -= 0.02;
+		var shadow:FlxSprite = pendulum.clone();
+		shadow.scale.set(pendulum.scale.x, pendulum.scale.y);
+		shadow.updateHitbox();
+		shadow.setPosition(pendulum.x, pendulum.y);
+		shadow.cameras = pendulum.cameras;
+		shadow.origin.set(pendulum.origin.x, pendulum.origin.y);
+		shadow.angle = pendulum.angle;
+		pendulumShadow.add(shadow);
+		shadow.alpha = 0.5;
+		FlxTween.tween(shadow, {alpha: 0}, Conductor.stepCrochet / 1000, {ease: FlxEase.linear, startDelay: Conductor.stepCrochet / 1000, onComplete: function (twn:FlxTween) {
+			pendulumShadow.remove(shadow);
+		}});
 		trace('GOOD');
 	}
 
@@ -3239,12 +3351,14 @@ class PlayState extends MusicBeatState
 
 	function psyshock() {
 		
-		var psyshockParticle = new Character(0, 0, 'hypno');
+		//var psyshockParticle = new Character(0, 0, 'hypno');
 		psyshockParticle.setPosition(dad.x, dad.y);
-		add(psyshockParticle);
+		//add(psyshockParticle);
 		psyshockParticle.playAnim("psyshock particle", true);
+		psyshockParticle.alpha = 1;
+		
 		psyshockParticle.animation.finishCallback = function (lol:String) {
-			remove(psyshockParticle);
+			psyshockParticle.alpha = 0;
 		};
 		
 		
@@ -3275,22 +3389,36 @@ class PlayState extends MusicBeatState
 				psyshockCooldown--;
 			}
 		}
-		switch (curStep % 16) {
-			case 7 | 15:
-				canHitPendulum = true;
-				//pendulum.color = FlxColor.GREEN;
-			case 10 | 2:
-				canHitPendulum = false;
-				if (!hitPendulum) {
-					losePendulum();
-				} else {
+		if (tranceActive) {
+			switch (curStep % 16) {
+				case 7 | 15:
+					canHitPendulum = true;
+					//pendulum.color = FlxColor.GREEN;
+				case 10 | 2:
+					canHitPendulum = false;
+					if (!hitPendulum) {
+						if (skippedFirstPendulum)
+							losePendulum();
+						else
+							skippedFirstPendulum = true;
+					} else {
+						
+						hitPendulum = false;
+						
+						
+					}
 					
-					hitPendulum = false;
-					
-					winPendulum();
-				}
-				
-				//pendulum.color = FlxColor.RED;
+					//pendulum.color = FlxColor.RED;
+				case 8 | 0:
+					keyboard.animation.play('press', true);
+				case 9 | 1:
+					keyboard.animation.play('idle', true);
+					if (keyboardTimer > 0) {
+						keyboardTimer--;
+					} else {
+						FlxTween.tween(keyboard, {alpha: 0}, Conductor.stepCrochet * 4 / 1000, {ease: FlxEase.linear});
+					}
+			}
 		}
 		if (FlxG.sound.music.time > Conductor.songPosition + 20 || FlxG.sound.music.time < Conductor.songPosition - 20)
 		{
