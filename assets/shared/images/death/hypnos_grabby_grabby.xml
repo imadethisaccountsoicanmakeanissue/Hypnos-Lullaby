@@ -1,0 +1,29 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TextureAtlas imagePath="hypnos_grabby_grabby.png">
+	<!-- Created with Adobe Animate version 21.0.8.42666 -->
+	<!-- http://www.adobe.com/products/animate.html -->
+	<SubTexture name="hypno_claw instance 10000" x="0" y="0" width="1363" height="823" frameX="0" frameY="-48" frameWidth="1752" frameHeight="919"/>
+	<SubTexture name="hypno_claw instance 10001" x="0" y="0" width="1363" height="823" frameX="0" frameY="-48" frameWidth="1752" frameHeight="919"/>
+	<SubTexture name="hypno_claw instance 10002" x="1368" y="0" width="1363" height="891" frameX="-280" frameY="-14" frameWidth="1752" frameHeight="919"/>
+	<SubTexture name="hypno_claw instance 10003" x="1368" y="0" width="1363" height="891" frameX="-280" frameY="-14" frameWidth="1752" frameHeight="919"/>
+	<SubTexture name="hypno_claw instance 10004" x="2736" y="0" width="1366" height="917" frameX="-386" frameY="0" frameWidth="1752" frameHeight="919"/>
+	<SubTexture name="hypno_claw instance 10005" x="2736" y="0" width="1366" height="917" frameX="-386" frameY="0" frameWidth="1752" frameHeight="919"/>
+	<SubTexture name="hypno_claw instance 10006" x="4107" y="0" width="1363" height="919" frameX="-380" frameY="0" frameWidth="1752" frameHeight="919"/>
+	<SubTexture name="hypno_claw instance 10007" x="4107" y="0" width="1363" height="919" frameX="-380" frameY="0" frameWidth="1752" frameHeight="919"/>
+	<SubTexture name="hypno_claw_still instance 10000" x="5475" y="0" width="1363" height="919" frameX="-10" frameY="-4" frameWidth="1377" frameHeight="935"/>
+	<SubTexture name="hypno_claw_still instance 10001" x="5475" y="0" width="1363" height="919" frameX="-10" frameY="-4" frameWidth="1377" frameHeight="935"/>
+	<SubTexture name="hypno_claw_still instance 10002" x="0" y="924" width="1363" height="919" frameX="-12" frameY="0" frameWidth="1377" frameHeight="935"/>
+	<SubTexture name="hypno_claw_still instance 10003" x="0" y="924" width="1363" height="919" frameX="-12" frameY="0" frameWidth="1377" frameHeight="935"/>
+	<SubTexture name="hypno_claw_still instance 10004" x="1368" y="924" width="1363" height="919" frameX="-2" frameY="-8" frameWidth="1377" frameHeight="935"/>
+	<SubTexture name="hypno_claw_still instance 10005" x="1368" y="924" width="1363" height="919" frameX="-2" frameY="-8" frameWidth="1377" frameHeight="935"/>
+	<SubTexture name="hypno_claw_still instance 10006" x="2736" y="924" width="1363" height="919" frameX="0" frameY="-16" frameWidth="1377" frameHeight="935"/>
+	<SubTexture name="hypno_claw_still instance 10007" x="2736" y="924" width="1363" height="919" frameX="0" frameY="-16" frameWidth="1377" frameHeight="935"/>
+	<SubTexture name="hypno_claw_still instance 10008" x="4104" y="924" width="1363" height="919" frameX="-6" frameY="-16" frameWidth="1377" frameHeight="935"/>
+	<SubTexture name="hypno_claw_still instance 10009" x="4104" y="924" width="1363" height="919" frameX="-6" frameY="-16" frameWidth="1377" frameHeight="935"/>
+	<SubTexture name="hypno_claw_still instance 10010" x="4104" y="924" width="1363" height="919" frameX="-8" frameY="-14" frameWidth="1377" frameHeight="935"/>
+	<SubTexture name="hypno_claw_still instance 10011" x="4104" y="924" width="1363" height="919" frameX="-8" frameY="-14" frameWidth="1377" frameHeight="935"/>
+	<SubTexture name="hypno_claw_still instance 10012" x="5475" y="0" width="1363" height="919" frameX="-12" frameY="-8" frameWidth="1377" frameHeight="935"/>
+	<SubTexture name="hypno_claw_still instance 10013" x="5475" y="0" width="1363" height="919" frameX="-12" frameY="-8" frameWidth="1377" frameHeight="935"/>
+	<SubTexture name="hypno_claw_still instance 10014" x="5475" y="0" width="1363" height="919" frameX="-14" frameY="-6" frameWidth="1377" frameHeight="935"/>
+	<SubTexture name="hypno_claw_still instance 10015" x="5475" y="0" width="1363" height="919" frameX="-14" frameY="-6" frameWidth="1377" frameHeight="935"/>
+</TextureAtlas>

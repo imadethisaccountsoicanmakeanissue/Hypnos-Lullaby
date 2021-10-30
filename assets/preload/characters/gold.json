@@ -87,7 +87,7 @@
 	"no_antialiasing": false,
 	"image": "characters/Lost Silver Assets Gold",
 	"position": [
-		0,
+		-10,
 		0
 	],
 	"healthicon": "gold",

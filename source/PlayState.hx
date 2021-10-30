@@ -368,23 +368,17 @@ class PlayState extends MusicBeatState
 				var resizeBG:Float = 0.7;
 				defaultCamZoom = 0.7;
 				
-				var background:BGSprite = new BGSprite(null, consistentPosition[0], consistentPosition[1]);
-				background.loadGraphic(PreloadState.preloadedAssets['hypno/Hypno bg background']);
-
+				var background:BGSprite = new BGSprite('hypno/Hypno bg background', consistentPosition[0], consistentPosition[1]);
 				background.setGraphicSize(Std.int(background.width * resizeBG));
 				background.updateHitbox();
 				add(background);
 
-				var midGround:BGSprite = new BGSprite(null, consistentPosition[0], consistentPosition[1]);
-				midGround.loadGraphic(PreloadState.preloadedAssets['hypno/Hypno bg midground']);
-
+				var midGround:BGSprite = new BGSprite('hypno/Hypno bg midground', consistentPosition[0], consistentPosition[1]);
 				midGround.setGraphicSize(Std.int(midGround.width * resizeBG));
 				midGround.updateHitbox();
 				add(midGround);
 
-				foreground = new BGSprite(null, consistentPosition[0], consistentPosition[1]);
-				foreground.loadGraphic(PreloadState.preloadedAssets['hypno/Hypno bg foreground']);
-				
+				foreground = new BGSprite('hypno/Hypno bg foreground', consistentPosition[0], consistentPosition[1]);
 				foreground.setGraphicSize(Std.int(foreground.width * resizeBG));
 				foreground.updateHitbox();
 			case 'missingno':
@@ -1618,6 +1612,7 @@ class PlayState extends MusicBeatState
 					FlxG.sound.music.pause();
 					vocals.pause();
 				}
+				
 				PauseSubState.transCamera = camOther;
 				openSubState(new PauseSubState(boyfriend.getScreenPosition().x, boyfriend.getScreenPosition().y));
 			
@@ -2198,7 +2193,15 @@ class PlayState extends MusicBeatState
 			vocals.stop();
 			FlxG.sound.music.stop();
 
-			openSubState(new GameOverSubstate(boyfriend.getScreenPosition().x, boyfriend.getScreenPosition().y, camFollowPos.x, camFollowPos.y, this));
+			switch (boyfriend.curCharacter) {	
+				case 'gf':
+					openSubState(new GFGameoverSubstate(boyfriend.getScreenPosition().x, boyfriend.getScreenPosition().y, camFollowPos.x, camFollowPos.y, this));
+				default:
+					if (boyfriend.curCharacter == 'bf-pixel')
+						GameOverSubstate.characterName = 'bf-pixel-dead';
+					openSubState(new GameOverSubstate(boyfriend.getScreenPosition().x, boyfriend.getScreenPosition().y, camFollowPos.x, camFollowPos.y, this));
+			}
+			
 			for (tween in modchartTweens) {
 				tween.active = true;
 			}
@@ -2563,65 +2566,69 @@ class PlayState extends MusicBeatState
 
 				storyPlaylist.remove(storyPlaylist[0]);
 
-				if (storyPlaylist.length <= 0)
-				{
-					FlxG.sound.playMusic(Paths.music('HYPNO_MENU'));
-
-					cancelFadeTween();
-					CustomFadeTransition.nextCamera = camOther;
-					if(FlxTransitionableState.skipNextTransIn) {
-						CustomFadeTransition.nextCamera = null;
-					}
-					MusicBeatState.switchState(new MainMenuState());
-
-					// if ()
-					if(!usedPractice) {
-						if (SONG.validScore)
-							Highscore.saveWeekScore('hypno', campaignScore, storyDifficulty);
-					}
-					usedPractice = false;
-					changedDifficulty = false;
-					cpuControlled = false;
-				}
-				else
-				{
-					var difficulty:String = '' + CoolUtil.difficultyStuff[storyDifficulty][1];
-
-					trace('LOADING NEXT SONG');
-					trace(Paths.formatToSongPath(PlayState.storyPlaylist[0]) + difficulty);
-
-					var winterHorrorlandNext = (Paths.formatToSongPath(SONG.song) == "safety-lullaby");
-					if (winterHorrorlandNext)
-					{
-						var blackShit:FlxSprite = new FlxSprite(-FlxG.width * FlxG.camera.zoom,
-							-FlxG.height * FlxG.camera.zoom).makeGraphic(FlxG.width * 3, FlxG.height * 3, FlxColor.BLACK);
-						blackShit.scrollFactor.set();
-						add(blackShit);
-						camHUD.visible = false;
-
-						FlxG.sound.play(Paths.sound('transitionSplatter'));
-					}
-
-					FlxTransitionableState.skipNextTransIn = true;
-					FlxTransitionableState.skipNextTransOut = true;
-
-					prevCamFollow = camFollow;
-					prevCamFollowPos = camFollowPos;
-
-					PlayState.SONG = Song.loadFromJson(PlayState.storyPlaylist[0] + difficulty, PlayState.storyPlaylist[0]);
-					FlxG.sound.music.stop();
-
-					if(winterHorrorlandNext) {
-						new FlxTimer().start(1.5, function(tmr:FlxTimer) {
+				if ((Paths.formatToSongPath(SONG.song) == "left-unchecked")) {
+					MusicBeatState.switchState(new LostSilverCutscene());
+				} else {
+					if (storyPlaylist.length <= 0)
+						{
+							FlxG.sound.playMusic(Paths.music('HYPNO_MENU'));
+		
 							cancelFadeTween();
-							//resetSpriteCache = true;
-							LoadingState.loadAndSwitchState(new PlayState());
-						});
-					} else {
-						cancelFadeTween();
-						//resetSpriteCache = true;
-						LoadingState.loadAndSwitchState(new PlayState());
-					}
+							CustomFadeTransition.nextCamera = camOther;
+							if(FlxTransitionableState.skipNextTransIn) {
+								CustomFadeTransition.nextCamera = null;
+							}
+							MusicBeatState.switchState(new MainMenuState());
+		
+							// if ()
+							if(!usedPractice) {
+								if (SONG.validScore)
+									Highscore.saveWeekScore('hypno', campaignScore, storyDifficulty);
+							}
+							usedPractice = false;
+							changedDifficulty = false;
+							cpuControlled = false;
+						}
+						else
+						{
+							var difficulty:String = '' + CoolUtil.difficultyStuff[storyDifficulty][1];
+		
+							trace('LOADING NEXT SONG');
+							trace(Paths.formatToSongPath(PlayState.storyPlaylist[0]) + difficulty);
+		
+							var winterHorrorlandNext = (Paths.formatToSongPath(SONG.song) == "safety-lullaby");
+							if (winterHorrorlandNext)
+							{
+								var blackShit:FlxSprite = new FlxSprite(-FlxG.width * FlxG.camera.zoom,
+									-FlxG.height * FlxG.camera.zoom).makeGraphic(FlxG.width * 3, FlxG.height * 3, FlxColor.BLACK);
+								blackShit.scrollFactor.set();
+								add(blackShit);
+								camHUD.visible = false;
+		
+								FlxG.sound.play(Paths.sound('transitionSplatter'));
+							}
+		
+							FlxTransitionableState.skipNextTransIn = true;
+							FlxTransitionableState.skipNextTransOut = true;
+		
+							prevCamFollow = camFollow;
+							prevCamFollowPos = camFollowPos;
+		
+							PlayState.SONG = Song.loadFromJson(PlayState.storyPlaylist[0] + difficulty, PlayState.storyPlaylist[0]);
+							FlxG.sound.music.stop();
+		
+							if(winterHorrorlandNext) {
+								new FlxTimer().start(1.5, function(tmr:FlxTimer) {
+									cancelFadeTween();
+									//resetSpriteCache = true;
+									LoadingState.loadAndSwitchState(new PlayState());
+								});
+							} else {
+								cancelFadeTween();
+								//resetSpriteCache = true;
+								LoadingState.loadAndSwitchState(new PlayState());
+							}
+						}
 				}
 			}
 			else

@@ -19,7 +19,8 @@ class LostSilverCutscene extends MusicBeatState {
         ["You're ugly"],
         ["Show your", "shitty viewers", "your skills"],
         ["I'm looking", "sus out here,", "take it"],
-        ["Might as well", "throw it out", "instead"]
+        ["Might as well", "throw it out", "instead"],
+        ['Wanna listen', 'to some', 'tunes?']
     ];
     
     var globalResizeConstant:Float = 2/3;
@@ -38,9 +39,14 @@ class LostSilverCutscene extends MusicBeatState {
     var optionsMap:Map<String, FlxSprite>;
     var list:Array<String> = ['Yes', 'No'];
     var curSelected:Int = 0;
+    var isEnding:Bool = false;
 
     override public function create() {
         super.create();
+
+        PreloadState.unlockedSongs[0] = true;
+        FlxG.save.data.silverUnlock = true;
+        FlxG.save.flush();
 
         var bg:FlxSprite = new FlxSprite().makeGraphic(FlxG.width, FlxG.height, FlxColor.BLACK);
 		bg.scrollFactor.set();
@@ -180,39 +186,80 @@ class LostSilverCutscene extends MusicBeatState {
             } else if (initialLines[speakCounter] == null)
                 finishedSpeaking = true;
         } else {
-            if (!startFading) {
-                // create options timer
-                var optionsTimer:FlxTimer = new FlxTimer().start(1, function(completed:FlxTimer){
-                    optionsGroup.forEach(function(dialogue:FlxBasic){
-                        FlxTween.tween(dialogue, {alpha: 1}, 1);
+            if (!isEnding) {
+                if (!startFading) {
+                    // create options timer
+                    var optionsTimer:FlxTimer = new FlxTimer().start(1, function(completed:FlxTimer){
+                        optionsGroup.forEach(function(dialogue:FlxBasic){
+                            FlxTween.tween(dialogue, {alpha: 1}, 1);
+                        });
+                        var dialogueTimer:FlxTimer = new FlxTimer().start(10, generateNewDialogue);
                     });
-                    var dialogueTimer:FlxTimer = new FlxTimer().start(10, generateNewDialogue);
-                });
-                startFading = true;
-            } else {
-                // options n shit
-                var selectedWithinThisFrame:Bool = false;
-                if (dialogueSelector.alpha > 0.3) {
-                    var controlArray:Array<Bool> = [controls.UI_LEFT_P, false, controls.UI_RIGHT_P];
-                    if (controlArray.contains(true)) {
-                        for (i in 0...controlArray.length) {
-                            if (controlArray[i] == true && !selectedWithinThisFrame) {
-                                curSelected += i - 1;
-                                if (curSelected < 0)
-                                    curSelected = 1;
-                                else if (curSelected > 1) 
-                                    curSelected = 0;
-
-                                dialogueSelector.setPosition(optionsMap[list[curSelected]].x - (dialogueSelector.width + 5), 
-                                    optionsMap[list[curSelected]].y + (dialogueSelector.height / 3)); 
-                                FlxG.sound.play(Paths.sound('HoverSFX'), 0.3);
-                                selectedWithinThisFrame = true;
+                    startFading = true;
+                } else {
+                    // options n shit
+                    var selectedWithinThisFrame:Bool = false;
+                    if (dialogueSelector.alpha > 0.3) {
+                        var controlArray:Array<Bool> = [controls.UI_LEFT_P, false, controls.UI_RIGHT_P];
+                        if (controlArray.contains(true)) {
+                            for (i in 0...controlArray.length) {
+                                if (controlArray[i] == true && !selectedWithinThisFrame) {
+                                    curSelected += i - 1;
+                                    if (curSelected < 0)
+                                        curSelected = 1;
+                                    else if (curSelected > 1) 
+                                        curSelected = 0;
+    
+                                    dialogueSelector.setPosition(optionsMap[list[curSelected]].x - (dialogueSelector.width + 5), 
+                                        optionsMap[list[curSelected]].y + (dialogueSelector.height / 3)); 
+                                    FlxG.sound.play(Paths.sound('HoverSFX'), 0.3);
+                                    selectedWithinThisFrame = true;
+                                }
                             }
+                            //
                         }
-                        //
                     }
+                    // inputs
+                    if (controls.ACCEPT) {
+                        FlxG.sound.play(Paths.sound('selector${list[curSelected]}'), 0.3);
+                        var fadeTime:Float = 2;
+                        switch (list[curSelected]) {
+                            case 'Yes':
+                                var noTimer:FlxTimer = new FlxTimer().start(fadeTime + 1, function(timer:FlxTimer){
+                                    // Nevermind that's stupid lmao
+								    PlayState.storyPlaylist = ["Monochrome"];
+								    PlayState.isStoryMode = true;
+								    PlayState.storyDifficulty = 2;
+
+								    PlayState.SONG = Song.loadFromJson(PlayState.storyPlaylist[0].toLowerCase(), PlayState.storyPlaylist[0].toLowerCase());
+								    PlayState.storyWeek = 1;
+								    PlayState.campaignScore = 0;
+								    PlayState.campaignMisses = 0;
+								    new FlxTimer().start(0.5, function(tmr:FlxTimer)
+								    {
+									    LoadingState.loadAndSwitchState(new PlayState());
+									    FlxG.sound.music.volume = 0;
+									    FreeplayState.destroyFreeplayVocals();
+								    });
+                                });
+                            case 'No':
+                                var noTimer:FlxTimer = new FlxTimer().start(fadeTime, function(timer:FlxTimer){
+                                    MusicBeatState.switchState(new MainMenuState());
+                                });
+                                FlxTween.tween(FlxG.camera, {zoom: 0.05}, fadeTime);
+                        }
+                        
+                        optionsGroup.forEach(function(dialogue:FlxBasic){
+                            FlxTween.tween(dialogue, {alpha: 0}, fadeTime);
+                        });
+                        FlxTween.tween(cartridgeGuy, {alpha: 0}, fadeTime);
+                        dialogueGroup.forEach(function(dialogue:FlxBasic){
+                            FlxTween.tween(dialogue, {alpha: 0}, fadeTime);
+                        });
+                        isEnding = true;
+                    }
+    
                 }
-                //
             }
         }
     }

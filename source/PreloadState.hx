@@ -21,12 +21,19 @@ class PreloadState extends FlxState {
 
     var loadText:FlxText;
     var assetStack:Map<String, PreloadType> = [
+        'death/gf_gameover_sprite' => PreloadType.image, 
+        'death/hypnos_grabby_grabby' => PreloadType.image, 
+        'death/forest' => PreloadType.image, 
+        'death/retry' => PreloadType.image, 
+        ///*
         'hypno/Hypno bg background' => PreloadType.image, 
         'hypno/Hypno bg midground' => PreloadType.image, 
         'hypno/Hypno bg foreground' => PreloadType.image,
-        'gf' => PreloadType.atlas,
         'hypno' => PreloadType.atlas,
+        /*
+        'gf' => PreloadType.atlas,
         'hypno-two' => PreloadType.atlas,
+        */
     ];
     var maxCount:Int;
 
@@ -38,6 +45,8 @@ class PreloadState extends FlxState {
 
     override public function create() {
         super.create();
+
+        FlxG.camera.alpha = 0;
 
         maxCount = Lambda.count(assetStack);
         trace(maxCount);
@@ -51,21 +60,18 @@ class PreloadState extends FlxState {
 		unownBg.loadGraphic(Paths.image('Loading Unown'));
         unownBg.setGraphicSize(Std.int(unownBg.width * globalRescale));
         unownBg.updateHitbox();
-		unownBg.alpha = 0;
 		backgroundGroup.add(unownBg);
 
         bg = new FlxSprite();
 		bg.loadGraphic(Paths.image('Loading Hypno'));
         bg.setGraphicSize(Std.int(bg.width * globalRescale));
         bg.updateHitbox();
-		bg.alpha = 0;
 		backgroundGroup.add(bg);
 
         var gfBg:FlxSprite = new FlxSprite();
 		gfBg.loadGraphic(Paths.image('Loading GF'));
         gfBg.setGraphicSize(Std.int(gfBg.width * globalRescale));
         gfBg.updateHitbox();
-		gfBg.alpha = 0;
 		backgroundGroup.add(gfBg);
 
         var pendulum:FlxSprite = new FlxSprite();
@@ -79,18 +85,16 @@ class PreloadState extends FlxState {
         pendulum.y = FlxG.height - (pendulum.height + 10);
 
         add(backgroundGroup);
-        backgroundGroup.forEach(function(spr:FlxSprite){
-            FlxTween.tween(spr, {alpha: 1}, 0.5, {
-                onComplete: function(tween:FlxTween){
-                    if (spr == bg)
-                        Thread.create(function(){
-                            assetGenerate();
-                        });
-                }
-            });
+        FlxTween.tween(FlxG.camera, {alpha: 1}, 0.5, {
+            onComplete: function(tween:FlxTween){
+                Thread.create(function(){
+                    assetGenerate();
+                });
+            }
         });
 
         // save bullshit
+        FlxG.save.bind('funkin', 'ninjamuffin99');
         if(FlxG.save.data != null) {
             if (FlxG.save.data.silverUnlock != null)
                 unlockedSongs[0] = FlxG.save.data.silverUnlock;
@@ -135,13 +139,10 @@ class PreloadState extends FlxState {
         }
 
         ///*
-        backgroundGroup.forEach(function(spr:FlxSprite){
-            FlxTween.tween(spr, {alpha: 0}, 0.5, {
-                onComplete: function(tween:FlxTween){
-                    if (spr == bg)
-                        FlxG.switchState(new TitleState());
-                }
-            });
+        FlxTween.tween(FlxG.camera, {alpha: 0}, 0.5, {
+            onComplete: function(tween:FlxTween){
+                FlxG.switchState(new TitleState());
+            }
         });
         //*/
 
