@@ -80,7 +80,8 @@ class ChartingState extends MusicBeatState
 		['Screen Shake', "Value 1: Camera shake\nValue 2: HUD shake\n\nEvery value works as the following example: \"1, 0.05\".\nThe first number (1) is the duration.\nThe second number (0.05) is the intensity."],
 		['Change Character', "Value 1: Character to change (Dad, BF, GF)\nValue 2: New character's name"],
 		['Psyshock', ":)"],
-		['Unown', 'Value 1: how many beats the thing should last']
+		['Unown', 'Value 1: how many beats the thing should last'],
+		['Celebi', 'Value 1: max health (somewhere between 0 - 2), 0 being max health']
 	];
 
 	var _file:FileReference;

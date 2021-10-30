@@ -1821,6 +1821,12 @@ class PlayState extends MusicBeatState
 			if (trance < -0.1)
 				trance = -0.1;
 
+			if (trance >= 0.8) {
+				if (trance >= 1.6)
+					boyfriend.idleSuffix = '-alt2';
+				else
+					boyfriend.idleSuffix = '-alt';
+			}
 			if (FlxG.keys.justPressed.SPACE) {
 				if (canHitPendulum) {
 					canHitPendulum = false;
@@ -2505,10 +2511,45 @@ class PlayState extends MusicBeatState
 				psyshock();
 			case 'Unown':
 				startUnown(Std.parseInt(value1));
+			case 'Celebi':
+				doCelebi(Std.parseFloat(value1));
 		}
 		callOnLuas('onEvent', [eventName, value1, value2]);
 	}
 
+	function doCelebi(newMax:Float):Void {
+		
+		maxHealth = newMax;
+		remove(healthBar);
+		healthBar = new FlxBar(healthBarBG.x + 4, healthBarBG.y + 4, RIGHT_TO_LEFT, Std.int(healthBarBG.width - 8) - Std.int(healthBar.width * (maxHealth / 2)) , Std.int(healthBarBG.height - 8), this,
+			'health', maxHealth, 2);
+		healthBar.scrollFactor.set();
+		healthBar.visible = !ClientPrefs.hideHud;
+		remove(iconP1);
+		remove(iconP2);
+		add(healthBar);
+		add(iconP1);
+		add(iconP2);
+		healthBar.cameras = [camHUD];
+		reloadHealthBarColors();
+
+		var celebi:FlxSprite = new FlxSprite(FlxG.width / 4, FlxG.height / 2);
+		celebi.frames = Paths.getSparrowAtlas(Paths.image('lostSilver/Celebi_Assets', 'shared'));
+		celebi.animation.addByPrefix('spawn', 'Celebi Spawn Full', 24, false);
+		celebi.animation.addByPrefix('idle', 'Celebi Idle', 24, false);
+		celebi.animation.play('spawn');
+		celebi.animation.finishCallback = function (name:String) {
+			celebi.animation.play('idle');
+		};
+		add(celebi);
+		new FlxTimer().start(Conductor.stepCrochet * 16 / 1000, function(tmr:FlxTimer)
+		{
+			celebi.animation.play('spawn', true, true);
+			celebi.animation.finishCallback = function (name:String) {
+				remove(celebi);
+			};
+		});
+	}
 	function moveCameraSection(?id:Int = 0):Void {
 		if(SONG.notes[id] == null) return;
 

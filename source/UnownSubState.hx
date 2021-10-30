@@ -94,12 +94,12 @@ class UnownSubState extends MusicBeatSubstate
 				//unown.x += 350 - (35 * selectedWord.length);
 				//var thing = 1 - (0.05 * selectedWord.length); 
 				if (260 - (15 * selectedWord.length) <= 0)
-					unown.x += 60 * i;
+					unown.x += 40 * i;
 				else
 					unown.x += (260 - (15 * selectedWord.length)) * i;
 				var realScale = 1 - (0.05 * selectedWord.length); 
-				if (realScale < 0.3)
-					realScale = 0.3;
+				if (realScale < 0.2)
+					realScale = 0.2;
 				unown.scale.set(realScale, realScale);
 				unown.updateHitbox();
 				unown.frames = Paths.getSparrowAtlas('Unown_Alphabet', 'shared');
