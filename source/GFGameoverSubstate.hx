@@ -75,7 +75,6 @@ class GFGameoverSubstate extends MusicBeatSubstate {
         retry.frames = Paths.getSparrowAtlas('death/retry', 'shared');
         retry.animation.addByPrefix('start', "gameover_start' instance 1", 24, false);
         retry.animation.addByPrefix('idle', "gameover_over instance 1", 24, true);
-        retry.animation.addByPrefix('concept', 'gameover_concept instance 1', 24, false);
         retry.setGraphicSize(Std.int(retry.width * 0.5));
         retry.updateHitbox();
         add(retry);
@@ -165,7 +164,6 @@ class GFGameoverSubstate extends MusicBeatSubstate {
                 isEnding = true;
                 gf.animation.play('deathConfirm', true);
                 gf.x -= 50;
-                retry.animation.play('concept');
                 FlxG.sound.music.stop();
                 FlxG.sound.play(Paths.music(endSoundName));
                 new FlxTimer().start(0.7, function(tmr:FlxTimer)

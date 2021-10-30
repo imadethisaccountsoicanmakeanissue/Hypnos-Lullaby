@@ -18,6 +18,9 @@ class HealthIcon extends FlxSprite
 	public var initialWidth:Float = 0;
 	public var initialHeight:Float = 0;
 
+	public var offsetX = 0;
+	public var offsetY = 0;
+
 	public function new(char:String = 'bf', isPlayer:Bool = false)
 	{
 		super();
@@ -42,6 +45,8 @@ class HealthIcon extends FlxSprite
 
 	public function changeIcon(char:String) {
 		if(this.char != char) {
+			offsetX = 0;
+			offsetY = 0;
 			switch (char) {
 				case 'hypno2' | 'hypno-two':
 					// LOOK IM LAZY :sob:
@@ -56,6 +61,16 @@ class HealthIcon extends FlxSprite
 					
 					animation.addByPrefix(char, 'Gold Icon', 24, true);
 					animation.play(char);
+
+					offsetY = 12;
+				case 'missingno':
+					var file:FlxAtlasFrames = Paths.getSparrowAtlas('icons/MissingnoIcons');
+					frames = file;
+					
+					animation.addByPrefix(char, 'missingno icons', 0, true);
+					animation.play(char);
+
+					offsetX = 24;
 				default:
 					var name:String = 'icons/' + char;
 					if(!Paths.fileExists('images/' + name + '.png', IMAGE)) name = 'icons/icon-' + char; //Older versions of psych engine's support
@@ -67,6 +82,7 @@ class HealthIcon extends FlxSprite
 			
 					animation.add(char, [0, 1], 0, false, isPlayer);
 					animation.play(char);
+					updateHitbox();
 			}
 			this.char = char;
 			updateHitbox();
@@ -74,7 +90,7 @@ class HealthIcon extends FlxSprite
 			initialHeight = height;
 		
 			antialiasing = ClientPrefs.globalAntialiasing;
-			if(char.endsWith('-pixel')) {
+			if(char.endsWith('-pixel') || char == 'missingno') {
 				antialiasing = false;
 			}
 		}
