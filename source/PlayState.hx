@@ -1800,9 +1800,6 @@ class PlayState extends MusicBeatState
 		if (isMonoDead) {
 			if (controls.ACCEPT)
 				MusicBeatState.resetState();
-			if (dad.animation.curAnim.curFrame == -14) {
-				remove(dad);
-			}
 			//trace(dad.animation.curAnim.curFrame);
 		}
 		if (tranceActive) {
@@ -2274,11 +2271,19 @@ class PlayState extends MusicBeatState
 
 			isDead = true;
 			isMonoDead = true;
-			
+		
+			dad.playAnim('fadeOut', true);
+			dad.animation.finishCallback = function (name:String) {
+				remove(dad);
+			}
 
-			dad.playAnim('fadeIn', true, true);
-			
-			FlxTween.tween(healthBar, {alpha: 0}, 1, {ease: FlxEase.linear});
+			FlxTween.tween(healthBar, {alpha: 0}, 1, {ease: FlxEase.linear, onComplete: function (twn:FlxTween) {
+				healthBar.visible = false;
+				healthBarBG.visible = false;
+				scoreTxt.visible = false;
+				iconP1.visible = false;
+				iconP2.visible = false;
+			}});
 			FlxTween.tween(healthBarBG, {alpha: 0}, 1, {ease: FlxEase.linear});
 			FlxTween.tween(scoreTxt, {alpha: 0}, 1, {ease: FlxEase.linear});
 			FlxTween.tween(iconP1, {alpha: 0}, 1, {ease: FlxEase.linear});
@@ -2533,9 +2538,10 @@ class PlayState extends MusicBeatState
 		healthBar.cameras = [camHUD];
 		reloadHealthBarColors();
 
-		var celebi:FlxSprite = new FlxSprite(FlxG.width / 4, FlxG.height / 2);
-		celebi.frames = Paths.getSparrowAtlas(Paths.image('lostSilver/Celebi_Assets', 'shared'));
+		var celebi:FlxSprite = new FlxSprite(0, FlxG.height / 2);
+		celebi.frames = Paths.getSparrowAtlas('lostSilver/Celebi_Assets', 'shared');
 		celebi.animation.addByPrefix('spawn', 'Celebi Spawn Full', 24, false);
+		celebi.animation.addByIndices('reverseSpawn', 'Celebi Spawn Full', [14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0],'', 24, false);
 		celebi.animation.addByPrefix('idle', 'Celebi Idle', 24, false);
 		celebi.animation.play('spawn');
 		celebi.animation.finishCallback = function (name:String) {
@@ -2544,7 +2550,7 @@ class PlayState extends MusicBeatState
 		add(celebi);
 		new FlxTimer().start(Conductor.stepCrochet * 16 / 1000, function(tmr:FlxTimer)
 		{
-			celebi.animation.play('spawn', true, true);
+			celebi.animation.play('reverseSpawn', true);
 			celebi.animation.finishCallback = function (name:String) {
 				remove(celebi);
 			};
