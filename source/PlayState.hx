@@ -22,6 +22,7 @@ import flixel.addons.effects.chainable.FlxWaveEffect;
 import flixel.addons.transition.FlxTransitionableState;
 import flixel.graphics.atlas.FlxAtlas;
 import flixel.graphics.frames.FlxAtlasFrames;
+
 import flixel.group.FlxGroup.FlxTypedGroup;
 import flixel.math.FlxMath;
 import flixel.math.FlxPoint;
@@ -72,7 +73,7 @@ class PlayState extends MusicBeatState
 	public var modchartTimers:Map<String, FlxTimer> = new Map<String, FlxTimer>();
 	public var modchartSounds:Map<String, FlxSound> = new Map<String, FlxSound>();
 	#end
-
+	var hand:FlxSprite;
 	//event variables
 	private var isCameraOnForcedPos:Bool = false;
 	#if (haxe >= "4.0.0")
@@ -131,6 +132,8 @@ class PlayState extends MusicBeatState
 
 	public var camZooming:Bool = false;
 	private var curSong:String = "";
+
+	var whiteHandDone:Bool = false;
 
 	public var gfSpeed:Int = 1;
 	public var health:Float = 1;
@@ -425,6 +428,12 @@ class PlayState extends MusicBeatState
 
 		add(gfGroup);
 		add(dadGroup);
+		hand = new FlxSprite();
+		hand.frames = Paths.getSparrowAtlas('hypno/White_Hand', 'shared');
+		hand.animation.addByPrefix('appear', 'White Hand FInished', 24, false);
+		hand.animation.play('appear');
+		hand.alpha = 0;
+		add(hand);
 		add(boyfriendGroup);
 		
 		if(curStage == 'alley') {
@@ -462,6 +471,7 @@ class PlayState extends MusicBeatState
 		startCharacterPos(boyfriend);
 		var camPos:FlxPoint;
 		if (SONG.player2 != 'gold') {
+			hand.setPosition(boyfriend.x + 500, boyfriend.y - 120);
 			boyfriendGroup.add(boyfriend);
 		
 			camPos = new FlxPoint(boyfriend.getGraphicMidpoint().x, boyfriend.getGraphicMidpoint().y);
@@ -1616,10 +1626,20 @@ class PlayState extends MusicBeatState
 		
 		openSubState(unownState);
 	}
+	
 	public function wonUnown():Void {
 		canPause = true;
 		unowning = false;
 	}
+
+	function doTheHand() {
+		hand.alpha = 1;
+		hand.animation.play('appear', true);
+		hand.animation.finishCallback = function (name:String) {
+			hand.alpha = 0;
+		};
+	}
+
 	override public function update(elapsed:Float)
 	{
 		/*if (FlxG.keys.justPressed.NINE)
@@ -1658,7 +1678,7 @@ class PlayState extends MusicBeatState
 		botplayTxt.visible = cpuControlled;
 
 		if (FlxG.keys.justPressed.X)
-			startUnown();
+			missingnoThing();
 
 		if (FlxG.keys.justPressed.ENTER && startedCountdown && canPause)
 		{
@@ -2516,10 +2536,36 @@ class PlayState extends MusicBeatState
 				startUnown(Std.parseInt(value1), value2);
 			case 'Celebi':
 				doCelebi(Std.parseFloat(value1));
+			case 'Missingno':
+				missingnoThing();
+				
 		}
 		callOnLuas('onEvent', [eventName, value1, value2]);
 	}
 
+	function missingnoThing() {
+		ClientPrefs.downScroll = FlxG.random.bool(50);
+
+		for (i in 0...playerStrums.length) {
+			if (i == 0) {
+				playerStrums.members[i].x = FlxG.random.int(100, Std.int(FlxG.width / 3));
+				if (ClientPrefs.downScroll)
+					playerStrums.members[i].y = FlxG.random.int(Std.int(FlxG.height / 2), FlxG.height - 100);
+				else
+					playerStrums.members[i].y = FlxG.random.int(0, 300);
+					
+			} else {
+				var futurex = FlxG.random.int(Std.int(playerStrums.members[i - 1].x) + 80, Std.int(playerStrums.members[i - 1].x) + 400);
+				if (futurex > FlxG.width - 100)
+					futurex = FlxG.width - 100;
+				playerStrums.members[i].x = futurex;
+
+				playerStrums.members[i].y = FlxG.random.int(Std.int(playerStrums.members[0].y - 50), Std.int(playerStrums.members[0].y + 50));
+			}
+		}
+
+		trace(playerStrums.members[0].y);
+	}
 	function doCelebi(newMax:Float):Void {
 		
 		maxHealth = newMax;
@@ -3424,7 +3470,7 @@ class PlayState extends MusicBeatState
 	}
 
 	function losePendulum() {
-		trance += 0.1;
+		trance += 0.2;
 		trace("BAD");
 	}
 
@@ -3499,6 +3545,15 @@ class PlayState extends MusicBeatState
 					}
 			}
 		}
+		switch (boyfriend.curCharacter) {
+			case 'gf':
+				if (!whiteHandDone) {
+					if (FlxG.random.int(0, 1000) == 5) {
+						doTheHand();
+						whiteHandDone = true;
+					}
+				}
+		}
 		if (FlxG.sound.music.time > Conductor.songPosition + 20 || FlxG.sound.music.time < Conductor.songPosition - 20)
 		{
 			resyncVocals();
@@ -3542,6 +3597,13 @@ class PlayState extends MusicBeatState
 		if (curBeat % 8 == 0)
 			resetPendulum(); 
 		switch (SONG.song.toLowerCase()) {
+			case 'missingno':
+				switch (curBeat) {
+					case 267:
+						for (i in opponentStrums) {
+							FlxTween.tween(i, {alpha: 0}, 0.7, {ease: FlxEase.linear});
+						}
+				}
 			case 'monochrome':
 				switch (curBeat) {
 					case 28:

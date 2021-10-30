@@ -81,7 +81,8 @@ class ChartingState extends MusicBeatState
 		['Change Character', "Value 1: Character to change (Dad, BF, GF)\nValue 2: New character's name"],
 		['Psyshock', ":)"],
 		['Unown', 'Value 1: how many beats the thing should last'],
-		['Celebi', 'Value 1: max health (somewhere between 0 - 2), 0 being max health']
+		['Celebi', 'Value 1: max health (somewhere between 0 - 2), 0 being max health'],
+		['Missingno', 'screw up your stuff lol']
 	];
 
 	var _file:FileReference;
