@@ -134,6 +134,7 @@ class PlayState extends MusicBeatState
 
 	public var gfSpeed:Int = 1;
 	public var health:Float = 1;
+	public var maxHealth:Float = 0;
 	public var combo:Int = 0;
 
 	private var healthBarBG:AttachedSprite;
@@ -1796,11 +1797,11 @@ class PlayState extends MusicBeatState
 		doDeathCheck();
 
 		
-		if (isMonoDead ) {
+		if (isMonoDead) {
 			if (controls.ACCEPT)
 				MusicBeatState.resetState();
-			if (dad.animation.curAnim.curFrame == -30) {
-				var black:
+			if (dad.animation.curAnim.curFrame == -14) {
+				remove(dad);
 			}
 			//trace(dad.animation.curAnim.curFrame);
 		}
@@ -2321,7 +2322,7 @@ class PlayState extends MusicBeatState
 		}
 	}
 	function doDeathCheck() {
-		if (health <= 0 && !practiceMode && !isDead)
+		if (health <= maxHealth && !practiceMode && !isDead)
 		{
 			die();
 			return true;

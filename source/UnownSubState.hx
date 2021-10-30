@@ -93,12 +93,15 @@ class UnownSubState extends MusicBeatSubstate
 				var unown:FlxSprite = new FlxSprite(0, 90);
 				//unown.x += 350 - (35 * selectedWord.length);
 				//var thing = 1 - (0.05 * selectedWord.length); 
-				unown.x += (260 - (15 * selectedWord.length)) * i;
+				if (260 - (15 * selectedWord.length) <= 0)
+					unown.x += 60 * i;
+				else
+					unown.x += (260 - (15 * selectedWord.length)) * i;
 				var realScale = 1 - (0.05 * selectedWord.length); 
+				if (realScale < 0.3)
+					realScale = 0.3;
 				unown.scale.set(realScale, realScale);
 				unown.updateHitbox();
-				
-				
 				unown.frames = Paths.getSparrowAtlas('Unown_Alphabet', 'shared');
 				unown.animation.addByPrefix('idle', selectedWord.charAt(i), 24, true);
 				unown.animation.play('idle');
@@ -132,7 +135,7 @@ class UnownSubState extends MusicBeatSubstate
 		if (position >= realWord.length) {
 			close();
 			win();
-			FlxG.sound.play(Paths.sound('CORRECT', 'shared'));
+			FlxG.sound.play(Paths.sound('correct', 'shared'));
 		}
 	}
 	override function update(elapsed:Float)
