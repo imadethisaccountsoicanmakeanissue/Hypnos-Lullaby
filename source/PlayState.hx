@@ -1604,12 +1604,12 @@ class PlayState extends MusicBeatState
 	var limoSpeed:Float = 0;
 	var camResize:Float = 0;
 
-	function startUnown(timer:Int = 15):Void {
+	function startUnown(timer:Int = 15, word:String = ''):Void {
 		canPause = false;
 		unowning = true;
 		persistentUpdate = true;
 		persistentDraw = true;
-		var unownState = new UnownSubState(timer);
+		var unownState = new UnownSubState(timer, word);
 		unownState.win = wonUnown;
 		unownState.lose = die;
 		unownState.cameras = [camHUD];
@@ -1819,6 +1819,8 @@ class PlayState extends MusicBeatState
 					boyfriend.idleSuffix = '-alt2';
 				else
 					boyfriend.idleSuffix = '-alt';
+			} else {
+				boyfriend.idleSuffix = '';
 			}
 			if (FlxG.keys.justPressed.SPACE) {
 				if (canHitPendulum) {
@@ -2511,7 +2513,7 @@ class PlayState extends MusicBeatState
 			case 'Psyshock':
 				psyshock();
 			case 'Unown':
-				startUnown(Std.parseInt(value1));
+				startUnown(Std.parseInt(value1), value2);
 			case 'Celebi':
 				doCelebi(Std.parseFloat(value1));
 		}
@@ -2534,7 +2536,7 @@ class PlayState extends MusicBeatState
 		healthBar.cameras = [camHUD];
 		reloadHealthBarColors();
 
-		var celebi:FlxSprite = new FlxSprite(0, FlxG.height / 2);
+		var celebi:FlxSprite = new FlxSprite(0 + FlxG.random.int(-150, -300), 0 + FlxG.random.int(-200, 200));
 		celebi.frames = Paths.getSparrowAtlas('lostSilver/Celebi_Assets', 'shared');
 		celebi.animation.addByPrefix('spawn', 'Celebi Spawn Full', 24, false);
 		celebi.animation.addByIndices('reverseSpawn', 'Celebi Spawn Full', [14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0],'', 24, false);
@@ -2542,8 +2544,33 @@ class PlayState extends MusicBeatState
 		celebi.animation.play('spawn');
 		celebi.animation.finishCallback = function (name:String) {
 			celebi.animation.play('idle');
+			var note:FlxSprite = new FlxSprite(celebi.x + FlxG.random.int(70, 100), celebi.y + FlxG.random.int(-50, 50));
+			note.frames = Paths.getSparrowAtlas('lostSilver/Note_asset', 'shared');
+			note.animation.addByPrefix('spawn', 'Note Full', 24, false);
+			note.animation.play('spawn');
+			note.animation.finishCallback = function (name:String) {
+				remove(note);
+			};
+			add(note);
+			FlxTween.tween(note, {x: note.x + FlxG.random.int(100, 190), y:FlxG.random.int(-80, 140)}, (Conductor.stepCrochet * 8 / 1000), {ease: FlxEase.quadOut});
+			celebi.animation.finishCallback = null;
 		};
 		add(celebi);
+
+		
+		new FlxTimer().start(Conductor.stepCrochet * 8 / 1000, function(tmr:FlxTimer)
+		{
+			var note:FlxSprite = new FlxSprite(celebi.x + FlxG.random.int(70, 100), celebi.y + FlxG.random.int(-50, 50));
+			note.frames = Paths.getSparrowAtlas('lostSilver/Note_asset', 'shared');
+			note.animation.addByPrefix('spawn', 'Note Full', 24, false);
+			note.animation.play('spawn');
+			note.animation.finishCallback = function (name:String) {
+				remove(note);
+			};
+			add(note);
+			FlxTween.tween(note, {x: note.x + FlxG.random.int(100, 190), y:FlxG.random.int(-80, 140)}, (Conductor.stepCrochet * 8 / 1000), {ease: FlxEase.quadOut});
+		});
+
 		new FlxTimer().start(Conductor.stepCrochet * 16 / 1000, function(tmr:FlxTimer)
 		{
 			celebi.animation.play('reverseSpawn', true);

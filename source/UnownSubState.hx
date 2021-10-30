@@ -53,7 +53,7 @@ class UnownSubState extends MusicBeatSubstate
 	public var lose:Void->Void = null;
 	var timer:Int = 10;
 	var timerTxt:FlxText;
-	public function new(theTimer:Int = 15)
+	public function new(theTimer:Int = 15, word:String = '')
 	{
 		
 		timer = theTimer;
@@ -71,8 +71,15 @@ class UnownSubState extends MusicBeatSubstate
 				selectedWord = 'BOOB LOL';
 			case 53:
 				selectedWord = 'WANNA WORK ON MY FNF MOD?';
+			case 54:
+				selectedWord = 'LMAO GOTTEM';
+			case 55:
+				selectedWord = 'RATIO';
 		}
+		if (word != '')
+			selectedWord = word;
 		//i forgor if there's a function to do this
+		selectedWord = selectedWord.toUpperCase();
 		var splitWord = selectedWord.split(' ');
 		var dum:Bool = false;
 		for (i in splitWord) {
