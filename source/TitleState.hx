@@ -56,6 +56,7 @@ class TitleState extends MusicBeatState
 
 	override public function create():Void
 	{
+		FlxG.camera.alpha = 1;
 		#if (polymod && !html5)
 		if (sys.FileSystem.exists('mods/')) {
 			var folders:Array<String> = [];
@@ -107,7 +108,7 @@ class TitleState extends MusicBeatState
 		swagShader = new ColorSwap();
 		super.create();
 
-		FlxG.save.bind('funkin', 'ninjamuffin99');
+		
 		ClientPrefs.loadPrefs();
 
 		Highscore.load();
