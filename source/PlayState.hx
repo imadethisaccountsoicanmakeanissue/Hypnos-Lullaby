@@ -241,10 +241,12 @@ class PlayState extends MusicBeatState
 
 	var pendulum:Pendulum;
 	var tranceThing:FlxSprite;
+	var tranceDeathScreen:FlxSprite;
 	var pendulumShadow:FlxTypedGroup<FlxSprite>;
 
 	var tranceActive:Bool = false;
 	var tranceSound:FlxSound;
+	var tranceCanKill:Bool = true;
 	var psyshockCooldown:Int = 80;
 	var psyshocking:Bool = false;
 	var keyboardTimer:Int = 8;
@@ -408,16 +410,16 @@ class PlayState extends MusicBeatState
 				add(background);
 
 				var ocean:FlxSprite = new FlxSprite(consistentPosition[0], consistentPosition[1]);
-				ocean.frames = Paths.getSparrowAtlas('missingno/sky', 'shared');
-				ocean.animation.addByPrefix('idle', 'ocean', 24, true);
+				ocean.frames = Paths.getSparrowAtlas('missingno/BG_Assets', 'shared');
+				ocean.animation.addByPrefix('idle', 'Bg Ocean', 24, true);
 				ocean.animation.play('idle');
 				ocean.scale.set(resizeBG, resizeBG);
 				ocean.updateHitbox();
 				add(ocean);
 
 				var ground:FlxSprite = new FlxSprite(consistentPosition[0], consistentPosition[1]);
-				ground.frames = Paths.getSparrowAtlas('missingno/ground', 'shared');
-				ground.animation.addByPrefix('idle', 'ground', 24, true);
+				ground.frames = Paths.getSparrowAtlas('missingno/BG_Assets', 'shared');
+				ground.animation.addByPrefix('idle', 'Bg Wave', 24, true);
 				ground.animation.play('idle');
 				ground.scale.set(resizeBG, resizeBG);
 				ground.updateHitbox();
@@ -782,6 +784,16 @@ class PlayState extends MusicBeatState
 		tranceThing.updateHitbox();
 		add(tranceThing);
 		tranceThing.alpha = 0;
+
+		tranceDeathScreen = new FlxSprite();
+		tranceDeathScreen.frames = Paths.getSparrowAtlas('hypno/StaticHypno_highopacity', 'shared');
+		tranceDeathScreen.animation.addByPrefix('idle', 'StaticHypno', 24, true);
+		tranceDeathScreen.animation.play('idle');
+		tranceDeathScreen.cameras = [camHUD];
+		tranceDeathScreen.setGraphicSize(FlxG.width, FlxG.height);
+		tranceDeathScreen.updateHitbox();
+		add(tranceDeathScreen);
+		tranceDeathScreen.alpha = 0;
 
 		psyshockParticle = new Character(0, 0, 'hypno');
 		psyshockParticle.playAnim("psyshock particle", true);
@@ -1843,7 +1855,8 @@ class PlayState extends MusicBeatState
 			
 			if (trance > 2) {
 				trance = 2;
-				die();
+				if (tranceCanKill)
+					die();
 			}
 			if (trance < -0.1)
 				trance = -0.1;
@@ -2248,6 +2261,8 @@ class PlayState extends MusicBeatState
 			}
 			if(FlxG.keys.justPressed.TWO) { //Go 10 seconds into the future :O
 				FlxG.sound.music.pause();
+				trance = 0;
+				health = 2;
 				vocals.pause();
 				Conductor.songPosition += 10000;
 				notes.forEachAlive(function(daNote:Note)
@@ -2549,6 +2564,8 @@ class PlayState extends MusicBeatState
 				if(bgGirls != null) bgGirls.swapDanceType();
 			case 'Psyshock':
 				psyshock();
+			case 'Fakeshock':
+				fakeshock();
 			case 'Unown':
 				startUnown(Std.parseInt(value1), value2);
 			case 'Celebi':
@@ -3510,6 +3527,19 @@ class PlayState extends MusicBeatState
 	function losePendulum() {
 		trance += 0.2;
 		trace("BAD");
+	}
+	
+	function fakeshock() {
+		psyshockParticle.setPosition(dad.x, dad.y);
+		psyshockParticle.playAnim("psyshock particle", true);
+		psyshockParticle.alpha = 1;
+		psyshockParticle.animation.finishCallback = function (lol:String) {
+			psyshockParticle.alpha = 0;
+		};
+		tranceDeathScreen.alpha += 0.1;
+		tranceCanKill = false;
+		FlxG.sound.play(Paths.sound('Psyshock', 'shared'), 1);
+		camHUD.flash(FlxColor.fromString('0xFFFFAFC1'), 1, null, true);
 	}
 
 	function psyshock() {
