@@ -164,6 +164,7 @@ class PlayState extends MusicBeatState
 	public var iconP1:HealthIcon;
 	public var iconP2:HealthIcon;
 	public var camHUD:FlxCamera;
+
 	var trance:Float = 0;
 	public var camGame:FlxCamera;
 	public var camOther:FlxCamera;
@@ -273,6 +274,7 @@ class PlayState extends MusicBeatState
 		FlxG.cameras.reset(camGame);
 		FlxG.cameras.add(camHUD);
 		FlxG.cameras.add(camOther);
+
 		grpNoteSplashes = new FlxTypedGroup<NoteSplash>();
 
 		FlxCamera.defaultCameras = [camGame];
@@ -295,13 +297,9 @@ class PlayState extends MusicBeatState
 
 		// String that contains the mode defined here so it isn't necessary to call changePresence for each mode
 		if (isStoryMode)
-		{
 			detailsText = "Story Mode: Hypno's Lullaby";
-		}
 		else
-		{
 			detailsText = "Freeplay";
-		}
 
 		// String for when the game is paused
 		detailsPausedText = "Paused - " + detailsText;
@@ -694,7 +692,8 @@ class PlayState extends MusicBeatState
 				switch (daSong)
 				{
 					case 'lullaby':
-						startDialogue(dialogueJson);
+						var doof:DialogueStart = new DialogueStart();
+						doof.scrollFactor.set();
 					default:
 						startCountdown();
 				}
@@ -711,7 +710,6 @@ class PlayState extends MusicBeatState
 			//dad.playAnim('fadeIn', true);
 			new FlxTimer().start(2, function(tmr:FlxTimer)
 			{
-				
 				startCountdown();
 			});
 		}
@@ -804,8 +802,24 @@ class PlayState extends MusicBeatState
 			timeBarBG.alpha = 0;
 			timeTxt.alpha = 0;
 			dad.visible = false;
+
+			// jumpscare
+			jumpScare = new FlxSprite().loadGraphic(Paths.image('lostSilver/Gold_Jumpscare'));
+			jumpScare.setGraphicSize(Std.int(FlxG.width * jumpscareSizeInterval), Std.int(FlxG.height * jumpscareSizeInterval));
+			jumpScare.updateHitbox();
+			jumpScare.screenCenter();
+			add(jumpScare);
+
+			jumpScare.setGraphicSize(Std.int(FlxG.width * jumpscareSizeInterval), Std.int(FlxG.height * jumpscareSizeInterval));
+			jumpScare.updateHitbox();
+			jumpScare.screenCenter();
+
+			jumpScare.visible = false;
+			jumpScare.cameras = [camHUD];
 		}
 	}
+
+	var jumpScare:FlxSprite;
 
 	public function addTextToDebug(text:String) {
 		#if LUA_ALLOWED
@@ -2406,7 +2420,10 @@ class PlayState extends MusicBeatState
 
 			case 'Center Camera':
 				cameraCentered = !cameraCentered;
-
+			
+			case 'Jumpscare':
+				jumpscare(Std.parseFloat(value1), Std.parseFloat(value2));
+				
 			case 'Set GF Speed':
 				var value:Int = Std.parseInt(value1);
 				if(Math.isNaN(value)) value = 1;
@@ -2566,6 +2583,27 @@ class PlayState extends MusicBeatState
 
 		trace(playerStrums.members[0].y);
 	}
+
+	var jumpscareSizeInterval:Float = 1.625;
+
+	function jumpscare(chance:Float, duration:Float) {
+		// jumpscare
+		var outOfTen:Float = Std.random(10);
+		if (outOfTen <= ((!Math.isNaN(chance)) ? chance : 4)) {
+			jumpScare.visible = true;
+			camHUD.shake(0.0125, (((!Math.isNaN(duration)) ? duration : 1) * Conductor.stepCrochet) / 1000, 
+				function(){
+					jumpScare.visible = false;
+					jumpscareSizeInterval += 0.125;
+					jumpScare.setGraphicSize(Std.int(FlxG.width * jumpscareSizeInterval), Std.int(FlxG.height * jumpscareSizeInterval));
+					jumpScare.updateHitbox();
+					jumpScare.screenCenter();
+				}, true
+			);
+
+		}
+	}
+
 	function doCelebi(newMax:Float):Void {
 		
 		maxHealth = newMax;
