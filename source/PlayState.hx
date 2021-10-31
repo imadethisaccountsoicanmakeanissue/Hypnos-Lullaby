@@ -3823,6 +3823,11 @@ class PlayState extends MusicBeatState
 						for (i in opponentStrums) {
 							FlxTween.tween(i, {alpha: 0}, 0.7, {ease: FlxEase.linear});
 						}
+					case 64:
+						defaultCamZoom = 0.8;
+					case 192:
+						if (ClientPrefs.hellMode)
+							startUnown(16, 'missingno');
 				}
 			case 'monochrome':
 				switch (curBeat) {

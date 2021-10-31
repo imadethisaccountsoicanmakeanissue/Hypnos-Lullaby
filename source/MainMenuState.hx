@@ -220,8 +220,7 @@ class MainMenuState extends MusicBeatState
 							keySequenceProgress = 0;
 						}
 						trace(keySequenceProgress);
-					}
-					
+					}	
 				}
 			}
 		}
