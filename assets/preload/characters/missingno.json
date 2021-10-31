@@ -1,11 +1,81 @@
 {
 	"animations": [
 		{
+			"loop": false,
+			"offsets": [
+				8,
+				-1
+			],
+			"anim": "singLEFT",
+			"fps": 24,
+			"name": "missingno left",
+			"indices": []
+		},
+		{
+			"loop": false,
+			"offsets": [
+				10,
+				0
+			],
+			"anim": "singDOWN",
+			"fps": 24,
+			"name": "missingno down",
+			"indices": []
+		},
+		{
+			"loop": false,
+			"offsets": [
+				1,
+				-2
+			],
+			"anim": "singUP",
+			"fps": 24,
+			"name": "missingno up",
+			"indices": []
+		},
+		{
+			"loop": false,
+			"offsets": [
+				3,
+				1
+			],
+			"anim": "singRIGHT",
+			"fps": 24,
+			"name": "missingno right",
+			"indices": []
+		},
+		{
+			"loop": false,
 			"offsets": [
 				0,
 				0
 			],
-			"indices": [],
+			"anim": "intro",
+			"fps": 24,
+			"name": "missingno intro",
+			"indices": []
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"indices": [
+				0,
+				1,
+				2,
+				3,
+				4,
+				5,
+				6,
+				7,
+				8,
+				9,
+				10,
+				11,
+				12,
+				13
+			],
 			"fps": 24,
 			"anim": "idle",
 			"loop": false,
@@ -13,58 +83,25 @@
 		},
 		{
 			"offsets": [
-				8,
-				-1
-			],
-			"indices": [],
-			"fps": 24,
-			"anim": "singLEFT",
-			"loop": false,
-			"name": "missingno left"
-		},
-		{
-			"offsets": [
-				10,
-				0
-			],
-			"indices": [],
-			"fps": 24,
-			"anim": "singDOWN",
-			"loop": false,
-			"name": "missingno down"
-		},
-		{
-			"offsets": [
-				1,
-				-2
-			],
-			"indices": [],
-			"fps": 24,
-			"anim": "singUP",
-			"loop": false,
-			"name": "missingno up"
-		},
-		{
-			"offsets": [
-				3,
-				1
-			],
-			"indices": [],
-			"fps": 24,
-			"anim": "singRIGHT",
-			"loop": false,
-			"name": "missingno right"
-		},
-		{
-			"offsets": [
 				0,
 				0
 			],
-			"indices": [],
+			"indices": [
+				14,
+				15,
+				16,
+				17,
+				18,
+				19,
+				20,
+				21,
+				22,
+				23
+			],
 			"fps": 24,
-			"anim": "intro",
+			"anim": "idle-alt",
 			"loop": false,
-			"name": "missingno intro"
+			"name": "missingno idle"
 		}
 	],
 	"no_antialiasing": true,

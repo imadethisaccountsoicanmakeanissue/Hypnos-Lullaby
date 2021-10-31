@@ -301,11 +301,11 @@ class MainMenuState extends MusicBeatState
 				PlayState.storyPlaylist = ["missingno"];
 				PlayState.isStoryMode = true;
 
-				var diffic = CoolUtil.difficultyStuff[curDifficulty][1];
+				var diffic = CoolUtil.difficultyStuff[2][2];
 				if (diffic == null) 
 					diffic = '';
 
-				PlayState.storyDifficulty = curDifficulty;
+				PlayState.storyDifficulty = 2;
 
 				PlayState.SONG = Song.loadFromJson(PlayState.storyPlaylist[0].toLowerCase() + diffic, PlayState.storyPlaylist[0].toLowerCase());
 				PlayState.storyWeek = 1;

@@ -265,6 +265,12 @@ class Character extends FlxSprite
 					playAnim('danceLeft' + idleSuffix);
 			}
 			else if(animation.getByName('idle' + idleSuffix) != null) {
+				if (curCharacter.toLowerCase() == 'missingno') {
+					if (FlxG.random.int(0, 5) == 2) {
+						playAnim('idle-alt');
+					} else
+						playAnim('idle' + idleSuffix);
+				} else
 					playAnim('idle' + idleSuffix);
 			}
 		}

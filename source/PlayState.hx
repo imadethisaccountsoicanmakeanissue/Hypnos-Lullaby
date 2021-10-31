@@ -140,6 +140,8 @@ class PlayState extends MusicBeatState
 	public var maxHealth:Float = 0;
 	public var combo:Int = 0;
 
+	public var celebiLayer:FlxTypedGroup<FlxSprite>;
+
 	private var healthBarBG:AttachedSprite;
 	public var healthBar:FlxBar;
 	var songPercent:Float = 0;
@@ -397,6 +399,9 @@ class PlayState extends MusicBeatState
 				foreground.updateHitbox();
 			case 'missingno':
 				defaultCamZoom = 0.6;
+				isPixelStage = true;
+				showCountdown = false;
+
 				var resizeBG:Float = 6;
 				var consistentPosition:Array<Float> = [-670, -240];
 
@@ -424,9 +429,13 @@ class PlayState extends MusicBeatState
 				ground.scale.set(resizeBG, resizeBG);
 				ground.updateHitbox();
 				add(ground);
+
+				
 		}
 
 		add(gfGroup);
+		celebiLayer = new FlxTypedGroup<FlxSprite>();
+		add(celebiLayer);
 		add(dadGroup);
 		hand = new FlxSprite();
 		hand.frames = Paths.getSparrowAtlas('hypno/White_Hand', 'shared');
@@ -503,8 +512,12 @@ class PlayState extends MusicBeatState
 			case 'missingno':
 				camPos.x = 510;
 				camPos.y = 358;
+
+				
 				dad.y -= 140;
 				dad.x -= 50;
+				dad.visible = false;
+				
 		}
 		strumLine = new FlxSprite(ClientPrefs.middleScroll ? STRUM_X_MIDDLESCROLL : STRUM_X, 50).makeGraphic(FlxG.width, 10);
 		if(ClientPrefs.downScroll) strumLine.y = FlxG.height - 150;
@@ -804,31 +817,38 @@ class PlayState extends MusicBeatState
 		FlxG.sound.play(Paths.sound('Psyshock', 'shared'), 0);
 		tranceSound = FlxG.sound.play(Paths.sound('TranceStatic', 'shared'), 0, true);
 
-		if (SONG.song.toLowerCase() == 'monochrome') {
-			healthBar.alpha = 0;
-			healthBarBG.alpha = 0;
-			iconP1.alpha = 0;
-			iconP2.alpha = 0;
-			scoreTxt.alpha = 0;
-			timeBar.alpha = 0;
-			timeBarBG.alpha = 0;
-			timeTxt.alpha = 0;
-			dad.visible = false;
+			
+		switch (SONG.song.toLowerCase()) {
+			case 'monochrome':
+				healthBar.alpha = 0;
+				healthBarBG.alpha = 0;
+				iconP1.alpha = 0;
+				iconP2.alpha = 0;
+				scoreTxt.alpha = 0;
+				timeBar.alpha = 0;
+				timeBarBG.alpha = 0;
+				timeTxt.alpha = 0;
+				dad.visible = false;
 
-			// jumpscare
-			jumpScare = new FlxSprite().loadGraphic(Paths.image('lostSilver/Gold_Jumpscare'));
-			jumpScare.setGraphicSize(Std.int(FlxG.width * jumpscareSizeInterval), Std.int(FlxG.height * jumpscareSizeInterval));
-			jumpScare.updateHitbox();
-			jumpScare.screenCenter();
-			add(jumpScare);
+				// jumpscare
+				jumpScare = new FlxSprite().loadGraphic(Paths.image('lostSilver/Gold_Jumpscare'));
+				jumpScare.setGraphicSize(Std.int(FlxG.width * jumpscareSizeInterval), Std.int(FlxG.height * jumpscareSizeInterval));
+				jumpScare.updateHitbox();
+				jumpScare.screenCenter();
+				add(jumpScare);
 
-			jumpScare.setGraphicSize(Std.int(FlxG.width * jumpscareSizeInterval), Std.int(FlxG.height * jumpscareSizeInterval));
-			jumpScare.updateHitbox();
-			jumpScare.screenCenter();
+				jumpScare.setGraphicSize(Std.int(FlxG.width * jumpscareSizeInterval), Std.int(FlxG.height * jumpscareSizeInterval));
+				jumpScare.updateHitbox();
+				jumpScare.screenCenter();
 
-			jumpScare.visible = false;
-			jumpScare.cameras = [camHUD];
-		}
+				jumpScare.visible = false;
+				jumpScare.cameras = [camHUD];
+			case 'missingno':
+				iconP2.alpha = 0;
+				camFollow.x = 510;
+				camFollow.y = 358;
+		} 
+		
 	}
 
 	var jumpScare:FlxSprite;
@@ -2356,8 +2376,11 @@ class PlayState extends MusicBeatState
 					case 'gf':
 						openSubState(new GFGameoverSubstate(boyfriend.getScreenPosition().x, boyfriend.getScreenPosition().y, camFollowPos.x, camFollowPos.y, this));
 					default:
-						if (boyfriend.curCharacter == 'bf-pixel')
+						if (boyfriend.curCharacter == 'bf-pixel') {
 							GameOverSubstate.characterName = 'bf-pixel-dead';
+							GameOverSubstate.loopSoundName = 'MissingnoDeath';
+							GameOverSubstate.endSoundName = 'MissingnoDone';
+						}
 						openSubState(new GameOverSubstate(boyfriend.getScreenPosition().x, boyfriend.getScreenPosition().y, camFollowPos.x, camFollowPos.y, this));
 				}
 				
@@ -2656,7 +2679,7 @@ class PlayState extends MusicBeatState
 			FlxTween.tween(note, {x: note.x + FlxG.random.int(100, 190), y:FlxG.random.int(-80, 140)}, (Conductor.stepCrochet * 8 / 1000), {ease: FlxEase.quadOut});
 			celebi.animation.finishCallback = null;
 		};
-		add(celebi);
+		celebiLayer.add(celebi);
 
 		
 		new FlxTimer().start(Conductor.stepCrochet * 8 / 1000, function(tmr:FlxTimer)
@@ -2676,7 +2699,7 @@ class PlayState extends MusicBeatState
 		{
 			celebi.animation.play('reverseSpawn', true);
 			celebi.animation.finishCallback = function (name:String) {
-				remove(celebi);
+				celebiLayer.remove(celebi);
 			};
 		});
 	}
@@ -3667,6 +3690,16 @@ class PlayState extends MusicBeatState
 		switch (SONG.song.toLowerCase()) {
 			case 'missingno':
 				switch (curBeat) {
+					case 59:
+						dad.debugMode = true;
+						dad.playAnim('intro', true);
+						dad.visible = true;
+						FlxG.sound.play(Paths.sound('missingnospawn', 'shared'));
+						dad.animation.finishCallback = function (name:String) {
+							dad.debugMode = false;
+							dad.animation.finishCallback = null;
+						};
+						FlxTween.tween(iconP2, {alpha: 1}, 1, {ease: FlxEase.linear});
 					case 267:
 						for (i in opponentStrums) {
 							FlxTween.tween(i, {alpha: 0}, 0.7, {ease: FlxEase.linear});
@@ -3682,6 +3715,17 @@ class PlayState extends MusicBeatState
 						FlxTween.tween(iconP2, {alpha: 1}, 3, {ease: FlxEase.linear});
 						for (i in playerStrums) {
 							FlxTween.tween(i, {alpha: 0.7}, 3, {ease: FlxEase.linear});
+						}
+					case 392:
+						dad.debugMode = true;
+						dad.playAnim('fadeOut', true);
+						FlxTween.tween(healthBar, {alpha: 0}, 1, {ease: FlxEase.linear});
+						FlxTween.tween(healthBarBG, {alpha: 0}, 1, {ease: FlxEase.linear});
+						FlxTween.tween(scoreTxt, {alpha: 0}, 1, {ease: FlxEase.linear});
+						FlxTween.tween(iconP1, {alpha: 0}, 1, {ease: FlxEase.linear});
+						FlxTween.tween(iconP2, {alpha: 0}, 1, {ease: FlxEase.linear});
+						for (i in playerStrums) {
+							FlxTween.tween(i, {alpha: 0}, 1, {ease: FlxEase.linear});
 						}
 				}
 		}
