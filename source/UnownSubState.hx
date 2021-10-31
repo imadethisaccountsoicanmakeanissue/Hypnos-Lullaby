@@ -142,7 +142,7 @@ class UnownSubState extends MusicBeatSubstate
 		if (position >= realWord.length) {
 			close();
 			win();
-			FlxG.sound.play(Paths.sound('correct', 'shared'));
+			FlxG.sound.play(Paths.sound('CORRECT', 'shared'));
 		}
 	}
 	override function update(elapsed:Float)

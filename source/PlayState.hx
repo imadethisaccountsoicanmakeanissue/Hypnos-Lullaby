@@ -159,7 +159,6 @@ class PlayState extends MusicBeatState
 	public static var changedDifficulty:Bool = false;
 	public static var cpuControlled:Bool = false;
 
-	var thingsToMessUp:Array<FlxSprite> = [];
 	
 
 	var botplaySine:Float = 0;
@@ -407,14 +406,13 @@ class PlayState extends MusicBeatState
 				var resizeBG:Float = 6;
 				var consistentPosition:Array<Float> = [-670, -240];
 
-				var background:FlxSprite = new FlxSprite(consistentPosition[0] + 30, consistentPosition[1]);
+				var background:FlxSprite = new FlxSprite(consistentPosition[0], consistentPosition[1]);
 				
 				background.frames = Paths.getSparrowAtlas('missingno/bg', 'shared');
 				background.animation.addByPrefix('idle', 'sky', 24, true);
 				background.animation.play('idle');
 				background.scale.set(resizeBG, resizeBG);
 				background.updateHitbox();
-				background.scrollFactor.set(0.3, 0.3);
 				add(background);
 
 				var ocean:FlxSprite = new FlxSprite(consistentPosition[0], consistentPosition[1]);
@@ -423,7 +421,6 @@ class PlayState extends MusicBeatState
 				ocean.animation.play('idle');
 				ocean.scale.set(resizeBG, resizeBG);
 				ocean.updateHitbox();
-				ocean.scrollFactor.set(0.5, 0.5);
 				add(ocean);
 
 				var ground:FlxSprite = new FlxSprite(consistentPosition[0], consistentPosition[1]);
@@ -434,9 +431,6 @@ class PlayState extends MusicBeatState
 				ground.updateHitbox();
 				add(ground);
 
-				thingsToMessUp.push(background);
-				thingsToMessUp.push(ocean);
-				thingsToMessUp.push(ground);
 				
 		}
 
@@ -712,6 +706,7 @@ class PlayState extends MusicBeatState
 				switch (daSong)
 				{
 					case 'safety-lullaby':
+						inCutscene = true;
 						var doof:DialogueStart = new DialogueStart(this);
 						doof.scrollFactor.set();
 						add(doof);
@@ -882,9 +877,6 @@ class PlayState extends MusicBeatState
 				iconP2.alpha = 0;
 				camFollow.x = 510;
 				camFollow.y = 358;
-
-				thingsToMessUp.push(boyfriend);
-				thingsToMessUp.push(dad);
 		} 
 		
 	}
@@ -1570,7 +1562,6 @@ class PlayState extends MusicBeatState
 				opponentStrums.add(babyArrow);
 			}
 
-			thingsToMessUp.push(babyArrow);
 			strumLineNotes.add(babyArrow);
 			babyArrow.postAddedToGroup();
 		}
@@ -2183,11 +2174,8 @@ class PlayState extends MusicBeatState
 				strumAlpha *= daNote.multAlpha;
 				var center:Float = strumY + Note.swagWidth / 2;
 
-				var psuedoX:Float = strumX;
-				var psuedoY:Float = strumY;
-
 				if(daNote.copyX) {
-					psuedoX = strumX;
+					daNote.x = strumX;
 				}
 				if(daNote.copyAngle) {
 					daNote.angle = strumAngle;
@@ -2197,21 +2185,20 @@ class PlayState extends MusicBeatState
 				}
 				if(daNote.copyY) {
 					if (isDownscroll) {
-						psuedoY = (strumY + 0.45 * (Conductor.songPosition - daNote.strumTime) * roundedSpeed);
+						daNote.y = (strumY + 0.45 * (Conductor.songPosition - daNote.strumTime) * roundedSpeed);
 						if (daNote.isSustainNote) {
 							//Jesus fuck this took me so much mother fucking time AAAAAAAAAA
 							if (daNote.animation.curAnim.name.endsWith('end')) {
-								psuedoY += 10.5 * (fakeCrochet / 400) * 1.5 * roundedSpeed + (46 * (roundedSpeed - 1));
-								psuedoY -= 46 * (1 - (fakeCrochet / 600)) * roundedSpeed;
+								daNote.y += 10.5 * (fakeCrochet / 400) * 1.5 * roundedSpeed + (46 * (roundedSpeed - 1));
+								daNote.y -= 46 * (1 - (fakeCrochet / 600)) * roundedSpeed;
 								if(PlayState.isPixelStage) {
-									psuedoY += 8;
+									daNote.y += 8;
 								} else {
-									psuedoY -= 19;
+									daNote.y -= 19;
 								}
 							} 
-							psuedoY += (Note.swagWidth / 2) - (60.5 * (roundedSpeed - 1));
-							psuedoY += 27.5 * ((SONG.bpm / 100) - 1) * (roundedSpeed - 1);
-							
+							daNote.y += (Note.swagWidth / 2) - (60.5 * (roundedSpeed - 1));
+							daNote.y += 27.5 * ((SONG.bpm / 100) - 1) * (roundedSpeed - 1);
 
 							if(daNote.mustPress || !daNote.ignoreNote)
 							{
@@ -2227,7 +2214,7 @@ class PlayState extends MusicBeatState
 							}
 						}
 					} else {
-						psuedoY = (strumY - 0.45 * (Conductor.songPosition - daNote.strumTime) * roundedSpeed);
+						daNote.y = (strumY - 0.45 * (Conductor.songPosition - daNote.strumTime) * roundedSpeed);
 
 						if(daNote.mustPress || !daNote.ignoreNote)
 						{
@@ -2244,17 +2231,6 @@ class PlayState extends MusicBeatState
 						}
 					}
 				}
-
-					// painful math equation
-					daNote.y = strumY
-							+ (Math.cos(flixel.math.FlxAngle.asRadians(strumAngle)) * psuedoY)
-							+ (Math.sin(flixel.math.FlxAngle.asRadians(strumAngle)) * psuedoX);
-	
-					daNote.x = strumX
-							+ (Math.cos(flixel.math.FlxAngle.asRadians(strumAngle)) * psuedoX)
-							+ (Math.sin(flixel.math.FlxAngle.asRadians(strumAngle)) * psuedoY);
-				
-
 
 				if (!daNote.mustPress && daNote.wasGoodHit && !daNote.hitByOpponent && !daNote.ignoreNote)
 				{
@@ -3847,8 +3823,6 @@ class PlayState extends MusicBeatState
 						for (i in opponentStrums) {
 							FlxTween.tween(i, {alpha: 0}, 0.7, {ease: FlxEase.linear});
 						}
-					case 64:
-						defaultCamZoom = 0.8;
 				}
 			case 'monochrome':
 				switch (curBeat) {

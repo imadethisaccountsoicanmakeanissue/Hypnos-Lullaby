@@ -211,7 +211,7 @@ class MainMenuState extends MusicBeatState
 								isDoingKeySequence = false;
 
 							if (keySequenceProgress > keySequence.length - 1) {
-								FlxG.sound.play(Paths.sound('correct', 'shared'));
+								FlxG.sound.play(Paths.sound('CORRECT', 'shared'));
 								keySequenceDone = true;
 								FlxG.mouse.visible = true;
 							}
