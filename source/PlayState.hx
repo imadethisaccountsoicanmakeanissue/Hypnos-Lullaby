@@ -706,9 +706,11 @@ class PlayState extends MusicBeatState
 			{
 				switch (daSong)
 				{
-					case 'lullaby':
+					case 'safety-lullaby':
 						var doof:DialogueStart = new DialogueStart();
 						doof.scrollFactor.set();
+						add(doof);
+						doof.cameras = [camHUD];
 					default:
 						startCountdown();
 				}
@@ -750,6 +752,7 @@ class PlayState extends MusicBeatState
 			pendulum.frames = Paths.getSparrowAtlas('hypno/Pendelum', 'shared');
 			pendulum.animation.addByPrefix('idle', 'Pendelum instance 1', 24, true);
 			pendulum.animation.play('idle');
+			pendulum.antialiasing = true; // fuck you ASH
 			
 			pendulum.scale.set(1.3, 1.3);
 			pendulum.updateHitbox();
@@ -772,6 +775,7 @@ class PlayState extends MusicBeatState
 			pendulum.cameras = [camHUD];
 			pendulum.x = FlxG.width / 4;
 			pendulum.y = 0;
+			pendulum.antialiasing = true; // fuck you again
 			add(pendulumShadow);
 			add(pendulum);
 
@@ -1686,6 +1690,8 @@ class PlayState extends MusicBeatState
 		};
 	}
 
+	var dadY:Float;
+
 	override public function update(elapsed:Float)
 	{
 		/*if (FlxG.keys.justPressed.NINE)
@@ -1797,6 +1803,13 @@ class PlayState extends MusicBeatState
 			cancelFadeTween();
 			CustomFadeTransition.nextCamera = camOther;
 			MusicBeatState.switchState(new CharacterEditorState(SONG.player2));
+		}
+
+		if (dad != null) {
+			if (!Math.isNaN(dadY) && dad.curCharacter == 'missingno') {
+				dad.y = dadY + ((Math.sin((Conductor.songPosition / 5000) * (180 / Math.PI))) * 25);
+			} else
+				dadY = dad.y;
 		}
 
 		if (startingSong)
@@ -3539,6 +3552,7 @@ class PlayState extends MusicBeatState
 		shadow.cameras = pendulum.cameras;
 		shadow.origin.set(pendulum.origin.x, pendulum.origin.y);
 		shadow.angle = pendulum.angle;
+		shadow.antialiasing = true;
 		pendulumShadow.add(shadow);
 		shadow.alpha = 0.5;
 		FlxTween.tween(shadow, {alpha: 0}, Conductor.stepCrochet / 1000, {ease: FlxEase.linear, startDelay: Conductor.stepCrochet / 1000, onComplete: function (twn:FlxTween) {

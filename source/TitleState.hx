@@ -456,24 +456,29 @@ class TitleState extends MusicBeatState
 					createCoolText(['Banbuds'], -90);
 					addMoreText('Ash', -90);
 				case 2:
-					addMoreText('Fidy50', -90);
 					addMoreText('Yoshubs', -90);
-				case 3:
-					addMoreText('Uncle Jeol', -90);
-					addMoreText('TheInnuendo', -90);
-				case 4:
 					addMoreText('Adam McHummus', -90);
+					
+				case 3:
 					addMoreText('Nimbus Cumulus', -90);
+					addMoreText('TheInnuendo', -90);
+					
+				case 4:
+					addMoreText('Uncle Jeol', -90);
+					addMoreText('ChillinHenry', -45);
+					
 				case 5:
 					deleteCoolText();
 				case 6:
-					addMoreText('ChillinHenry', -45);
-					addMoreText('Sandplanet', -45);
-				case 7:
 					addMoreText('ScorchVx', -45);
-					addMoreText('Mr_Nol', -45);
-				case 8:
 					addMoreText('typic', -45);
+
+				case 7:
+					addMoreText('Mr_Nol', -45);
+					addMoreText('Fidy50', -90);
+					
+				case 8:
+					addMoreText('Sandplanet', -45);
 				case 9:
 					addMoreText('Present');
 	

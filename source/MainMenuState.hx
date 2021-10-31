@@ -256,6 +256,7 @@ class MainMenuState extends MusicBeatState
 								// Nevermind that's stupid lmao
 								PlayState.storyPlaylist = ["Safety Lullaby", "Left Unchecked"];
 								PlayState.isStoryMode = true;
+								PlayState.seenCutscene = false;
 
 								var diffic = CoolUtil.difficultyStuff[curDifficulty][1];
 								if (diffic == null) 
