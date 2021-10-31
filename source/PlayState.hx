@@ -706,7 +706,7 @@ class PlayState extends MusicBeatState
 				switch (daSong)
 				{
 					case 'safety-lullaby':
-						var doof:DialogueStart = new DialogueStart();
+						var doof:DialogueStart = new DialogueStart(this);
 						doof.scrollFactor.set();
 						add(doof);
 						doof.cameras = [camHUD];
@@ -1944,7 +1944,7 @@ class PlayState extends MusicBeatState
 			} else {
 				boyfriend.idleSuffix = '';
 			}
-			if (FlxG.keys.justPressed.SPACE) {
+			if (FlxG.keys.justPressed.SPACE && !inCutscene) {
 				if (canHitPendulum) {
 					canHitPendulum = false;
 					hitPendulum = true;
