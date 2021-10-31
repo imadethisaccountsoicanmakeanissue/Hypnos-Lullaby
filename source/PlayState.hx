@@ -2183,8 +2183,11 @@ class PlayState extends MusicBeatState
 				strumAlpha *= daNote.multAlpha;
 				var center:Float = strumY + Note.swagWidth / 2;
 
+				var psuedoX:Float = strumX;
+				var psuedoY:Float = strumY;
+
 				if(daNote.copyX) {
-					daNote.x = strumX;
+					psuedoX = strumX;
 				}
 				if(daNote.copyAngle) {
 					daNote.angle = strumAngle;
@@ -2194,20 +2197,21 @@ class PlayState extends MusicBeatState
 				}
 				if(daNote.copyY) {
 					if (isDownscroll) {
-						daNote.y = (strumY + 0.45 * (Conductor.songPosition - daNote.strumTime) * roundedSpeed);
+						psuedoY = (strumY + 0.45 * (Conductor.songPosition - daNote.strumTime) * roundedSpeed);
 						if (daNote.isSustainNote) {
 							//Jesus fuck this took me so much mother fucking time AAAAAAAAAA
 							if (daNote.animation.curAnim.name.endsWith('end')) {
-								daNote.y += 10.5 * (fakeCrochet / 400) * 1.5 * roundedSpeed + (46 * (roundedSpeed - 1));
-								daNote.y -= 46 * (1 - (fakeCrochet / 600)) * roundedSpeed;
+								psuedoY += 10.5 * (fakeCrochet / 400) * 1.5 * roundedSpeed + (46 * (roundedSpeed - 1));
+								psuedoY -= 46 * (1 - (fakeCrochet / 600)) * roundedSpeed;
 								if(PlayState.isPixelStage) {
-									daNote.y += 8;
+									psuedoY += 8;
 								} else {
-									daNote.y -= 19;
+									psuedoY -= 19;
 								}
 							} 
-							daNote.y += (Note.swagWidth / 2) - (60.5 * (roundedSpeed - 1));
-							daNote.y += 27.5 * ((SONG.bpm / 100) - 1) * (roundedSpeed - 1);
+							psuedoY += (Note.swagWidth / 2) - (60.5 * (roundedSpeed - 1));
+							psuedoY += 27.5 * ((SONG.bpm / 100) - 1) * (roundedSpeed - 1);
+							
 
 							if(daNote.mustPress || !daNote.ignoreNote)
 							{
@@ -2223,7 +2227,7 @@ class PlayState extends MusicBeatState
 							}
 						}
 					} else {
-						daNote.y = (strumY - 0.45 * (Conductor.songPosition - daNote.strumTime) * roundedSpeed);
+						psuedoY = (strumY - 0.45 * (Conductor.songPosition - daNote.strumTime) * roundedSpeed);
 
 						if(daNote.mustPress || !daNote.ignoreNote)
 						{
@@ -2240,6 +2244,17 @@ class PlayState extends MusicBeatState
 						}
 					}
 				}
+
+					// painful math equation
+					daNote.y = strumY
+							+ (Math.cos(flixel.math.FlxAngle.asRadians(strumAngle)) * psuedoY)
+							+ (Math.sin(flixel.math.FlxAngle.asRadians(strumAngle)) * psuedoX);
+	
+					daNote.x = strumX
+							+ (Math.cos(flixel.math.FlxAngle.asRadians(strumAngle)) * psuedoX)
+							+ (Math.sin(flixel.math.FlxAngle.asRadians(strumAngle)) * psuedoY);
+				
+
 
 				if (!daNote.mustPress && daNote.wasGoodHit && !daNote.hitByOpponent && !daNote.ignoreNote)
 				{
