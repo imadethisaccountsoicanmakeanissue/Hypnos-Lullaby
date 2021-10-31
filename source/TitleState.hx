@@ -465,20 +465,20 @@ class TitleState extends MusicBeatState
 					
 				case 4:
 					addMoreText('Uncle Jeol', -90);
-					addMoreText('ChillinHenry', -45);
+					addMoreText('ChillinHenry', -90);
 					
 				case 5:
 					deleteCoolText();
 				case 6:
-					addMoreText('ScorchVx', -45);
-					addMoreText('typic', -45);
+					addMoreText('ScorchVx', -90);
+					addMoreText('typic', -90);
 
 				case 7:
-					addMoreText('Mr_Nol', -45);
+					addMoreText('Mr_Nol', -90);
 					addMoreText('Fidy50', -90);
 					
 				case 8:
-					addMoreText('Sandplanet', -45);
+					addMoreText('Sandplanet', -90);
 				case 9:
 					addMoreText('Present');
 	
