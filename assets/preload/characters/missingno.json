@@ -1,48 +1,59 @@
 {
 	"animations": [
 		{
-			"loop": false,
 			"offsets": [
 				8,
 				-1
 			],
-			"anim": "singLEFT",
+			"loop": false,
 			"fps": 24,
-			"name": "missingno left",
-			"indices": []
+			"anim": "singLEFT",
+			"indices": [],
+			"name": "missingno left"
 		},
 		{
-			"loop": false,
 			"offsets": [
 				10,
 				0
 			],
-			"anim": "singDOWN",
+			"loop": false,
 			"fps": 24,
-			"name": "missingno down",
-			"indices": []
+			"anim": "singDOWN",
+			"indices": [],
+			"name": "missingno down"
 		},
 		{
-			"loop": false,
 			"offsets": [
 				1,
 				-2
 			],
-			"anim": "singUP",
+			"loop": false,
 			"fps": 24,
-			"name": "missingno up",
-			"indices": []
+			"anim": "singUP",
+			"indices": [],
+			"name": "missingno up"
 		},
 		{
-			"loop": false,
 			"offsets": [
 				3,
 				1
 			],
-			"anim": "singRIGHT",
+			"loop": false,
 			"fps": 24,
-			"name": "missingno right",
-			"indices": []
+			"anim": "singRIGHT",
+			"indices": [],
+			"name": "missingno right"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "intro",
+			"indices": [],
+			"name": "missingno intro"
 		},
 		{
 			"loop": false,
@@ -50,16 +61,9 @@
 				0,
 				0
 			],
-			"anim": "intro",
+			"anim": "idle",
 			"fps": 24,
-			"name": "missingno intro",
-			"indices": []
-		},
-		{
-			"offsets": [
-				0,
-				0
-			],
+			"name": "missingno idle",
 			"indices": [
 				0,
 				1,
@@ -75,17 +79,17 @@
 				11,
 				12,
 				13
-			],
-			"fps": 24,
-			"anim": "idle",
-			"loop": false,
-			"name": "missingno idle"
+			]
 		},
 		{
+			"loop": false,
 			"offsets": [
 				0,
 				0
 			],
+			"anim": "idle-alt",
+			"fps": 24,
+			"name": "missingno idle",
 			"indices": [
 				14,
 				15,
@@ -97,11 +101,7 @@
 				21,
 				22,
 				23
-			],
-			"fps": 24,
-			"anim": "idle-alt",
-			"loop": false,
-			"name": "missingno idle"
+			]
 		}
 	],
 	"no_antialiasing": true,
@@ -118,8 +118,8 @@
 		152
 	],
 	"camera_position": [
-		-280,
-		-180
+		-480,
+		-190
 	],
 	"sing_duration": 4,
 	"scale": 7.00000000000001
