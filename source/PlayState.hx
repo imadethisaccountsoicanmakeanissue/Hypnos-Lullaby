@@ -3849,6 +3849,9 @@ class PlayState extends MusicBeatState
 						}
 					case 64:
 						defaultCamZoom = 0.8;
+					case 192:
+						if (ClientPrefs.hellMode)
+							startUnown(16, 'missingno');
 				}
 			case 'monochrome':
 				switch (curBeat) {
