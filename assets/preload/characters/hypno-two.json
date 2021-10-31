@@ -1,70 +1,70 @@
 {
 	"animations": [
 		{
+			"loop": false,
 			"offsets": [
 				11,
 				-348
 			],
-			"loop": false,
-			"fps": 24,
 			"anim": "singDOWN",
-			"indices": [],
-			"name": "Hypno Down"
+			"fps": 24,
+			"name": "Hypno Down",
+			"indices": []
 		},
 		{
+			"loop": false,
 			"offsets": [
 				-3,
 				141
 			],
-			"loop": false,
-			"fps": 24,
 			"anim": "singUP",
-			"indices": [],
-			"name": "Hypno Up Finished"
+			"fps": 24,
+			"name": "Hypno Up Finished",
+			"indices": []
 		},
 		{
+			"loop": false,
 			"offsets": [
 				4,
 				-139
 			],
-			"loop": false,
-			"fps": 24,
 			"anim": "singRIGHT",
-			"indices": [],
-			"name": "Hypno Right Finished"
+			"fps": 24,
+			"name": "Hypno Right Finished",
+			"indices": []
 		},
 		{
+			"loop": false,
 			"offsets": [
 				37,
 				11
 			],
-			"loop": false,
-			"fps": 24,
 			"anim": "firstDeath",
-			"indices": [],
-			"name": "BF dies"
+			"fps": 24,
+			"name": "BF dies",
+			"indices": []
 		},
 		{
+			"loop": false,
 			"offsets": [
 				59,
 				-94
 			],
-			"loop": false,
-			"fps": 24,
 			"anim": "singLEFT",
-			"indices": [],
-			"name": "Hypno Left final"
+			"fps": 24,
+			"name": "Hypno Left final",
+			"indices": []
 		},
 		{
-			"loop": true,
 			"offsets": [
 				-4,
 				6
 			],
-			"anim": "idle",
+			"loop": true,
 			"fps": 24,
-			"name": "Hypno2 Idle",
-			"indices": []
+			"anim": "idle",
+			"indices": [],
+			"name": "Hypno2 Idle"
 		}
 	],
 	"no_antialiasing": false,
@@ -81,7 +81,7 @@
 		68
 	],
 	"camera_position": [
-		-20,
+		120,
 		250
 	],
 	"sing_duration": 4,

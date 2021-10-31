@@ -1,76 +1,80 @@
 {
 	"animations": [
 		{
+			"loop": false,
 			"offsets": [
 				-150,
 				-120
 			],
-			"loop": false,
-			"fps": 24,
 			"anim": "singDOWN",
-			"indices": [],
-			"name": "Final Hypno Down"
+			"fps": 24,
+			"name": "Final Hypno Down",
+			"indices": []
 		},
 		{
+			"loop": false,
 			"offsets": [
 				-89,
 				267
 			],
-			"loop": false,
-			"fps": 24,
 			"anim": "singUP",
-			"indices": [],
-			"name": "Hypno Up"
+			"fps": 24,
+			"name": "Hypno Up",
+			"indices": []
 		},
 		{
+			"loop": false,
 			"offsets": [
 				-338,
 				93
 			],
-			"loop": false,
-			"fps": 24,
 			"anim": "singRIGHT",
-			"indices": [],
-			"name": "Hypno Right"
+			"fps": 24,
+			"name": "Hypno Right",
+			"indices": []
 		},
 		{
+			"loop": false,
 			"offsets": [
 				0,
 				0
 			],
-			"loop": false,
-			"fps": 24,
 			"anim": "idle",
-			"indices": [],
-			"name": "Hypno Idle 1"
+			"fps": 24,
+			"name": "Hypno Idle 1",
+			"indices": []
 		},
 		{
+			"loop": false,
 			"offsets": [
 				144,
 				22
 			],
-			"loop": false,
-			"fps": 24,
 			"anim": "singLEFT",
-			"indices": [],
-			"name": "Hypno Left"
-		},
-		{
-			"loop": false,
-			"offsets": [
-				-312,
-				22
-			],
-			"anim": "psyshock",
 			"fps": 24,
-			"name": "Psyshock Full",
+			"name": "Hypno Left",
 			"indices": []
 		},
 		{
 			"offsets": [
+				-312,
+				22
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "psyshock",
+			"indices": [],
+			"name": "Psyshock Full"
+		},
+		{
+			"loop": false,
+			"offsets": [
 				-940,
 				190
 			],
+			"anim": "psyshock particle",
+			"fps": 24,
+			"name": "Full Psyshock Particle",
 			"indices": [
 				0,
 				1,
@@ -79,11 +83,7 @@
 				4,
 				5,
 				6
-			],
-			"fps": 24,
-			"anim": "psyshock particle",
-			"loop": false,
-			"name": "Full Psyshock Particle"
+			]
 		}
 	],
 	"no_antialiasing": false,
@@ -100,7 +100,7 @@
 		68
 	],
 	"camera_position": [
-		0,
+		110,
 		0
 	],
 	"sing_duration": 4,

@@ -739,6 +739,8 @@ class PreferencesSubstate extends MusicBeatSubstate
 		'Framerate', //Apparently 120FPS isn't correctly supported on Browser? Probably it has some V-Sync shit enabled by default, idk
 		#end
 		'GAMEPLAY',
+		'Hell Mode',
+		'Pussy Mode',
 		'Downscroll',
 		'Middlescroll',
 		'Ghost Tapping',
@@ -934,6 +936,13 @@ class PreferencesSubstate extends MusicBeatSubstate
 					
 					case 'Hide Song Length':
 						ClientPrefs.hideTime = !ClientPrefs.hideTime;
+
+					case 'Hell Mode':
+						ClientPrefs.hellMode = !ClientPrefs.hellMode;
+						ClientPrefs.pussyMode = false;
+					case 'Pussy Mode':
+						ClientPrefs.pussyMode = !ClientPrefs.pussyMode;
+						ClientPrefs.hellMode = false;
 				}
 				FlxG.sound.play(Paths.sound('scrollMenu'));
 				reloadValues();
@@ -1027,6 +1036,10 @@ class PreferencesSubstate extends MusicBeatSubstate
 				daText = "If checked, hides most HUD elements.";
 			case 'Hide Song Length':
 				daText = "If checked, the bar showing how much time is left\nwill be hidden.";
+			case 'Hell Mode':
+				daText = "Makes everything harder.";
+			case 'Pussy Mode':
+				daText = "Turns all the mechanics off\nalso certifies you as a pussy";
 		}
 		descText.text = daText;
 
@@ -1099,6 +1112,10 @@ class PreferencesSubstate extends MusicBeatSubstate
 						daValue = ClientPrefs.imagesPersist;
 					case 'Hide Song Length':
 						daValue = ClientPrefs.hideTime;
+					case 'Hell Mode':
+						daValue = ClientPrefs.hellMode;
+					case 'Pussy Mode':
+						daValue = ClientPrefs.pussyMode;
 				}
 				checkbox.daValue = daValue;
 			}

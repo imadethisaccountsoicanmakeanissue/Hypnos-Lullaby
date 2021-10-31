@@ -7,6 +7,8 @@ import flixel.graphics.FlxGraphic;
 import Controls;
 
 class ClientPrefs {
+	public static var pussyMode:Bool = false;
+	public static var hellMode:Bool = false;
 	public static var downScroll:Bool = false;
 	public static var middleScroll:Bool = false;
 	public static var showFPS:Bool = true;
@@ -52,6 +54,8 @@ class ClientPrefs {
 	}
 
 	public static function saveSettings() {
+		FlxG.save.data.pussyMode = pussyMode;
+		FlxG.save.data.hellMode = hellMode;
 		FlxG.save.data.downScroll = downScroll;
 		FlxG.save.data.middleScroll = middleScroll;
 		FlxG.save.data.showFPS = showFPS;
@@ -81,6 +85,13 @@ class ClientPrefs {
 	}
 
 	public static function loadPrefs() {
+		if(FlxG.save.data.pussyMode != null) {
+			pussyMode = FlxG.save.data.pussyMode;
+		}
+
+		if(FlxG.save.data.hellMode != null) {
+			hellMode = FlxG.save.data.hellMode;
+		}
 		if(FlxG.save.data.downScroll != null) {
 			downScroll = FlxG.save.data.downScroll;
 		}

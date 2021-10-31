@@ -29,6 +29,7 @@ class PauseSubState extends MusicBeatSubstate
 
 	public static var transCamera:FlxCamera;
 
+	public static var levelInfo:FlxText;
 	public function new(x:Float, y:Float)
 	{
 		super();
@@ -51,7 +52,7 @@ class PauseSubState extends MusicBeatSubstate
 		bg.scrollFactor.set();
 		add(bg);
 
-		var levelInfo:FlxText = new FlxText(20, 15, 0, "", 32);
+		levelInfo = new FlxText(20, 15, 0, "", 32);
 		levelInfo.text += PlayState.SONG.song;
 		levelInfo.scrollFactor.set();
 		levelInfo.setFormat(Paths.font("vcr.ttf"), 32);
