@@ -302,7 +302,7 @@ class MainMenuState extends MusicBeatState
 				PlayState.storyPlaylist = ["missingno"];
 				PlayState.isStoryMode = true;
 
-				var diffic = CoolUtil.difficultyStuff[2][2];
+				var diffic = CoolUtil.difficultyStuff[2][1];
 				if (diffic == null) 
 					diffic = '';
 
