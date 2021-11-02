@@ -194,4 +194,9 @@ class UnownSubState extends MusicBeatSubstate
 		}
 		timerTxt.text = Std.string(timer);
 	}
+
+	override public function close() {
+		FlxG.autoPause = true;
+		super.close();
+	}
 }

@@ -723,7 +723,8 @@ class PreferencesSubstate extends MusicBeatSubstate
 	private static var curSelected:Int = 0;
 	static var unselectableOptions:Array<String> = [
 		'GRAPHICS',
-		'GAMEPLAY'
+		'GAMEPLAY',
+		'MODES'
 	];
 	static var noCheckbox:Array<String> = [
 		'Framerate',
@@ -732,15 +733,17 @@ class PreferencesSubstate extends MusicBeatSubstate
 
 	static var options:Array<String> = [
 		'GRAPHICS',
-		'Low Quality',
-		'Anti-Aliasing',
+		// 'Low Quality',
+		// 'Anti-Aliasing',
 		'Persistent Cached Data',
+		'Photosensitive Mode',
 		#if !html5
 		'Framerate', //Apparently 120FPS isn't correctly supported on Browser? Probably it has some V-Sync shit enabled by default, idk
 		#end
-		'GAMEPLAY',
+		'MODES',
 		'Hell Mode',
 		'Pussy Mode',
+		'GAMEPLAY',
 		'Downscroll',
 		'Middlescroll',
 		'Ghost Tapping',
@@ -909,6 +912,9 @@ class PreferencesSubstate extends MusicBeatSubstate
 					case 'Flashing Lights':
 						ClientPrefs.flashing = !ClientPrefs.flashing;
 
+					case 'Photosensitive Mode':
+						ClientPrefs.photosensitive = !ClientPrefs.photosensitive;
+
 					case 'Violence':
 						ClientPrefs.violence = !ClientPrefs.violence;
 
@@ -1028,8 +1034,8 @@ class PreferencesSubstate extends MusicBeatSubstate
 				daText = "If unchecked, you won't get disgusted as frequently.";
 			case 'Note Splashes':
 				daText = "If unchecked, hitting \"Sick!\" notes won't show particles.";
-			case 'Flashing Lights':
-				daText = "Uncheck this if you're sensitive to flashing lights!";
+			case 'Photosensitive Mode':
+				daText = "Disables hard flashing lights and jumpscares.";
 			case 'Camera Zooms':
 				daText = "If unchecked, the camera won't zoom in on a beat hit.";
 			case 'Hide HUD':
@@ -1094,6 +1100,8 @@ class PreferencesSubstate extends MusicBeatSubstate
 						daValue = ClientPrefs.noteSplashes;
 					case 'Flashing Lights':
 						daValue = ClientPrefs.flashing;
+					case 'Photosensitive Mode':
+						daValue = ClientPrefs.photosensitive;
 					case 'Downscroll':
 						daValue = ClientPrefs.downScroll;
 					case 'Middlescroll':

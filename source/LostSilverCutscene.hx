@@ -266,21 +266,13 @@ class LostSilverCutscene extends MusicBeatState {
 
     var firstDialogueTimer:FlxTimer;
     var baseCounterLoopTimes:Int = 0;
-    var lastInteger:Int;
     function generateNewDialogue(onComplete:FlxTimer) {
         dialogueText.text = '';
         falseText = '';
         speakCounter = 0;
 
         var decidedInteger:Int = FlxG.random.int(0, cartridgeLines.length - 1);
-        // uh weird check so its not the same
-        if (decidedInteger == lastInteger) {
-            if (cartridgeLines[decidedInteger - 1] != null)
-                decidedInteger--;
-            else decidedInteger++;
-        }
-        lastInteger = decidedInteger;
-        
+
         baseCounterLoopTimes = 0;
         firstDialogueTimer = new FlxTimer().start(0.0625, function(completed:FlxTimer){
             var newLine:String = cartridgeLines[decidedInteger][speakCounter];
