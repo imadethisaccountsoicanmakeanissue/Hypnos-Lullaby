@@ -58,6 +58,7 @@ class MainMenuState extends MusicBeatState
 
 		// generate key sequence dynamically
 		keySequenceDone = PreloadState.unlockedSongs[1];
+		FlxG.mouse.visible = keySequenceDone;
 		keySequence = [];
 		for (i in 0...3) {
 			for (i in 0...2)
@@ -100,11 +101,11 @@ class MainMenuState extends MusicBeatState
 
 		FlxG.camera.follow(camFollowPos, null, 1);
 
-		var hypnoShit:FlxText = new FlxText(12, FlxG.height - 44, 0, "Hypno's Lullaby v1.0", 12);
+		var hypnoShit:FlxText = new FlxText(12, FlxG.height - 44, 0, "Hypno's Lullaby v1.1.0", 12);
 		hypnoShit.scrollFactor.set();
 		hypnoShit.setFormat("VCR OSD Mono", 16, FlxColor.WHITE, LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 		add(hypnoShit);
-		var versionShit:FlxText = new FlxText(12, FlxG.height - 24, 0, "Friday Night Funkin' v" + Application.current.meta.get('version'), 12);
+		var versionShit:FlxText = new FlxText(12, FlxG.height - 24, 0, "FNF Psych Engine' v0.4.2", 12);
 		versionShit.scrollFactor.set();
 		versionShit.setFormat("VCR OSD Mono", 16, FlxColor.WHITE, LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 		add(versionShit);
