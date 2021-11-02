@@ -406,13 +406,14 @@ class PlayState extends MusicBeatState
 				var resizeBG:Float = 6;
 				var consistentPosition:Array<Float> = [-670, -240];
 
-				var background:FlxSprite = new FlxSprite(consistentPosition[0], consistentPosition[1]);
+				var background:FlxSprite = new FlxSprite(consistentPosition[0] + 30, consistentPosition[1]);
 				
 				background.frames = Paths.getSparrowAtlas('missingno/bg', 'shared');
 				background.animation.addByPrefix('idle', 'sky', 24, true);
 				background.animation.play('idle');
 				background.scale.set(resizeBG, resizeBG);
 				background.updateHitbox();
+				background.scrollFactor.set(0.3, 0.3);
 				add(background);
 
 				var ocean:FlxSprite = new FlxSprite(consistentPosition[0], consistentPosition[1]);
@@ -421,6 +422,7 @@ class PlayState extends MusicBeatState
 				ocean.animation.play('idle');
 				ocean.scale.set(resizeBG, resizeBG);
 				ocean.updateHitbox();
+				ocean.scrollFactor.set(0.4, 0.4);
 				add(ocean);
 
 				var ground:FlxSprite = new FlxSprite(consistentPosition[0], consistentPosition[1]);
@@ -430,8 +432,6 @@ class PlayState extends MusicBeatState
 				ground.scale.set(resizeBG, resizeBG);
 				ground.updateHitbox();
 				add(ground);
-
-				
 		}
 
 		add(gfGroup);
@@ -1770,8 +1770,6 @@ class PlayState extends MusicBeatState
 		}
 		botplayTxt.visible = cpuControlled;
 
-		if (FlxG.keys.justPressed.X)
-			missingnoThing();
 
 		if (FlxG.keys.justPressed.ENTER && startedCountdown && canPause)
 		{
@@ -2394,7 +2392,7 @@ class PlayState extends MusicBeatState
 
 			isDead = true;
 			isMonoDead = true;
-		
+			dad.debugMode = true;
 			dad.playAnim('fadeOut', true);
 			dad.animation.finishCallback = function (name:String) {
 				remove(dad);
@@ -3851,6 +3849,14 @@ class PlayState extends MusicBeatState
 						for (i in playerStrums) {
 							FlxTween.tween(i, {alpha: 0}, 1, {ease: FlxEase.linear});
 						}
+					case 224:
+						if (ClientPrefs.hellMode)
+							startUnown(16, 'abcdefghijklmnopqrstuvwxyz');
+						else
+							startUnown(8);
+					case 232:
+						if (!ClientPrefs.hellMode)
+							startUnown(8);
 				}
 		}
 		if(lastBeatHit >= curBeat) {

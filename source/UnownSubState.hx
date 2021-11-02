@@ -55,7 +55,8 @@ class UnownSubState extends MusicBeatSubstate
 	var timerTxt:FlxText;
 	public function new(theTimer:Int = 15, word:String = '')
 	{
-		
+		if (ClientPrefs.hellMode)
+			words.push('SKILL ISSUE');
 		timer = theTimer;
 		super();
 		var overlay:FlxSprite = new FlxSprite().makeGraphic(FlxG.width, FlxG.height, FlxColor.RED);
