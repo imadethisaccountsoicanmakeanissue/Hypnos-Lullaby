@@ -89,10 +89,10 @@ class FreeplayState extends MusicBeatState
 		addSong('Safety Lullaby', 0, 'hypno', 0xFF000000);
 		addSong('Left Unchecked', 0, 'hypno2', 0xFF000000);
 
-		if (PreloadState.unlockedSongs[0])
-			addSong('Monochrome', 0, 'gold', 0xFF000000);
-		if (PreloadState.unlockedSongs[1])
-			addSong('Missingno', 0, 'missingno', 0xFF000000);
+		
+		addSong('Monochrome', 0, 'gold', 0xFF000000);
+		
+		addSong('Missingno', 0, 'missingno', 0xFF000000);
 
 		// LOAD MUSIC
 
